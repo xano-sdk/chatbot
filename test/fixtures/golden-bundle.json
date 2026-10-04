@@ -1,0 +1,5659 @@
+{
+  "app": "xano",
+  "version": "1.03",
+  "type": "workspace",
+  "payload": {
+    "partial": false,
+    "workspace": {
+      "name": "xts-chatbot-golden",
+      "description": "",
+      "canonical": "",
+      "use_xdo": false,
+      "preferences": {
+        "allow_push": false,
+        "track_performance": true,
+        "use_internal_docs": false
+      },
+      "swagger": false,
+      "env": [],
+      "settings": {
+        "ai_enabled": false,
+        "ai_settings": {
+          "providers": {
+            "google": {
+              "model": "",
+              "api_key": ""
+            },
+            "openai": {
+              "model": "",
+              "api_key": ""
+            },
+            "anthropic": {
+              "model": "",
+              "api_key": ""
+            },
+            "azure-openai": {
+              "model": "",
+              "api_key": "",
+              "base_url": "",
+              "api_version": ""
+            }
+          },
+          "default_provider": "free"
+        },
+        "hide_xano_agent": false
+      },
+      "guid": "e388689f2bda45cf09f5a35c9489fad8"
+    },
+    "dbo": [
+      {
+        "name": "golden_user",
+        "description": "",
+        "docs": "",
+        "auth": true,
+        "install": false,
+        "schema": [
+          {
+            "name": "id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "created_at",
+            "type": "epochms",
+            "_xsid": "",
+            "nullable": false,
+            "default": "now",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "private",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "email",
+            "type": "email",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              },
+              {
+                "name": "lower",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          }
+        ],
+        "index": [
+          {
+            "name": "",
+            "lang": "",
+            "type": "primary",
+            "fields": [
+              {
+                "name": "id",
+                "op": ""
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree",
+            "fields": [
+              {
+                "name": "created_at",
+                "op": "desc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          }
+        ],
+        "autocomplete": [],
+        "external": {
+          "source": "",
+          "id": ""
+        },
+        "views": [],
+        "tag": [],
+        "sql_name": "",
+        "use_xdo": false,
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "b25f08616176d89e63786103b0fc2aa7",
+        "import": {
+          "mode": "standard"
+        }
+      },
+      {
+        "name": "conversation",
+        "description": "A single chat thread. Owned by a user (authenticated) and/or reachable with a session token (guest).",
+        "docs": "",
+        "auth": false,
+        "install": false,
+        "schema": [
+          {
+            "name": "id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "created_at",
+            "type": "epochms",
+            "_xsid": "",
+            "nullable": false,
+            "default": "now",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "private",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "user_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": true,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "@",
+                "disabled": false,
+                "arg": [
+                  "dbo=b25f08616176d89e63786103b0fc2aa7"
+                ]
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The user this conversation belongs to. Null until a guest thread is claimed."
+          },
+          {
+            "name": "session_token",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "internal",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Opaque bearer capability for guest access to this thread. Treat it like a password."
+          },
+          {
+            "name": "title",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Human-readable thread title. Seeded from the first user message."
+          },
+          {
+            "name": "last_message_at",
+            "type": "epochms",
+            "_xsid": "",
+            "nullable": true,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "When the most recent message was appended. Null until the first send."
+          }
+        ],
+        "index": [
+          {
+            "name": "",
+            "lang": "",
+            "type": "primary",
+            "fields": [
+              {
+                "name": "id",
+                "op": ""
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "gin",
+            "fields": [
+              {
+                "name": "xdo",
+                "op": "jsonb_path_op"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree",
+            "fields": [
+              {
+                "name": "created_at",
+                "op": "desc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree",
+            "fields": [
+              {
+                "name": "user_id",
+                "op": "asc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree|unique",
+            "fields": [
+              {
+                "name": "session_token",
+                "op": "asc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          }
+        ],
+        "autocomplete": [],
+        "external": {
+          "source": "",
+          "id": ""
+        },
+        "views": [],
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "sql_name": "",
+        "use_xdo": true,
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "82dcb96c2b194384d632c35b67d6bd52",
+        "import": {
+          "mode": "standard"
+        }
+      },
+      {
+        "name": "conversation_message",
+        "description": "One turn in a conversation. Replayed to the agent as an LLM message.",
+        "docs": "",
+        "auth": false,
+        "install": false,
+        "schema": [
+          {
+            "name": "id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "created_at",
+            "type": "epochms",
+            "_xsid": "",
+            "nullable": false,
+            "default": "now",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "private",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "@",
+                "disabled": false,
+                "arg": [
+                  "dbo=82dcb96c2b194384d632c35b67d6bd52"
+                ]
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The thread this message belongs to."
+          },
+          {
+            "name": "role",
+            "type": "enum",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [
+              "user",
+              "assistant",
+              "system"
+            ],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Who produced this turn. The engine rejects any other value when replaying it."
+          },
+          {
+            "name": "content",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "min",
+                "disabled": false,
+                "arg": [
+                  1
+                ]
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The message text. Must be non-empty — a blank turn makes the model confabulate."
+          }
+        ],
+        "index": [
+          {
+            "name": "",
+            "lang": "",
+            "type": "primary",
+            "fields": [
+              {
+                "name": "id",
+                "op": ""
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "gin",
+            "fields": [
+              {
+                "name": "xdo",
+                "op": "jsonb_path_op"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree",
+            "fields": [
+              {
+                "name": "created_at",
+                "op": "desc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          },
+          {
+            "name": "",
+            "lang": "",
+            "type": "btree",
+            "fields": [
+              {
+                "name": "conversation_id",
+                "op": "asc"
+              },
+              {
+                "name": "created_at",
+                "op": "asc"
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            }
+          }
+        ],
+        "autocomplete": [],
+        "external": {
+          "source": "",
+          "id": ""
+        },
+        "views": [],
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "sql_name": "",
+        "use_xdo": true,
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "9212556e48dcdde206e1f564d3de8eb3",
+        "import": {
+          "mode": "standard"
+        }
+      }
+    ],
+    "addon": [],
+    "function": [
+      {
+        "name": "chatbot/generate_reply",
+        "description": "Appends a user message, runs the chat agent over recent history, appends the reply, and returns it. Performs no authorization.",
+        "docs": "",
+        "workspace": {
+          "id": 0
+        },
+        "branch": {
+          "id": 0
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "history": {
+          "inherit": true,
+          "enabled": false,
+          "limit": 100
+        },
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The thread to append to. NOT authorized here — the caller must have checked ownership."
+          },
+          {
+            "name": "content",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The user's message text. Must be non-empty."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "conversation_id",
+            "tag": "input",
+            "value": "conversation_id",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "reply",
+            "tag": "var",
+            "value": "run.result",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "message_id",
+            "tag": "var",
+            "value": "assistant_message.id",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "tool_calls",
+            "tag": "const:array",
+            "value": "[]",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "content",
+                        "tag": "input",
+                        "filters": [
+                          {
+                            "name": "trim",
+                            "disabled": false,
+                            "arg": []
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "badrequest",
+              "error": {
+                "value": "Message content cannot be empty.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "user_message",
+            "name": "mvp:dbo_add",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "created_at",
+                "value": "now",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "conversation_id",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "role",
+                "value": "user",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "content",
+                "value": "content",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "recent",
+            "name": "mvp:dbo_view",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "role",
+                  "children": []
+                },
+                {
+                  "name": "content",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "conversation_id",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "return": {
+                "type": "list",
+                "list": {
+                  "distinct": "auto",
+                  "sort": [
+                    {
+                      "sortBy": "created_at",
+                      "orderBy": "desc"
+                    },
+                    {
+                      "sortBy": "id",
+                      "orderBy": "desc"
+                    }
+                  ],
+                  "paging": {
+                    "enabled": true,
+                    "page": 1,
+                    "offset": 0,
+                    "per_page": 12,
+                    "metadata": false,
+                    "totals": false
+                  }
+                }
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "turns",
+            "name": "mvp:array_map",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "output_type": "object",
+              "collection": {
+                "value": "recent",
+                "tag": "var",
+                "filters": [
+                  {
+                    "name": "reverse",
+                    "disabled": false,
+                    "arg": []
+                  }
+                ]
+              },
+              "transform_object": [
+                {
+                  "attribute_key": {
+                    "value": "role",
+                    "tag": "const",
+                    "filters": []
+                  },
+                  "attribute_value": {
+                    "value": "$this.role",
+                    "tag": "var",
+                    "filters": []
+                  }
+                },
+                {
+                  "attribute_key": {
+                    "value": "content",
+                    "tag": "const",
+                    "filters": []
+                  },
+                  "attribute_value": {
+                    "value": "$this.content",
+                    "tag": "var",
+                    "filters": []
+                  }
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "messages_json",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "turns",
+              "tag": "var",
+              "filters": [
+                {
+                  "name": "json_encode",
+                  "disabled": false,
+                  "arg": []
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "run",
+            "name": "mvp:call_agent",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "args",
+                "value": "{ messages: $var.messages_json }",
+                "tag": "const:expr2",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "toolset": {
+                "id": "2d7f6782dc621289c7663157d2df67c5"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "run.result",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "standard",
+              "error": {
+                "value": "The assistant returned an empty reply. Try again.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "assistant_message",
+            "name": "mvp:dbo_add",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "created_at",
+                "value": "now",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "conversation_id",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "role",
+                "value": "assistant",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "content",
+                "value": "run.result",
+                "tag": "var",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "title",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:conditional",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation.title",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "if": {
+                "run": [
+                  {
+                    "as": "",
+                    "name": "mvp:dbo_editby",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [
+                      {
+                        "name": "field_name",
+                        "value": "id",
+                        "tag": "const",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "field_value",
+                        "value": "conversation_id",
+                        "tag": "input",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "last_message_at",
+                        "value": "now",
+                        "tag": "const",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "title",
+                        "value": "content",
+                        "tag": "input",
+                        "filters": [
+                          {
+                            "name": "substr",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "0",
+                                "tag": "const:int",
+                                "filters": []
+                              },
+                              {
+                                "value": "60",
+                                "tag": "const:int",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      }
+                    ],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "dbo": {
+                        "id": "82dcb96c2b194384d632c35b67d6bd52"
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
+              },
+              "elif": {
+                "run": []
+              },
+              "else": {
+                "run": [
+                  {
+                    "as": "",
+                    "name": "mvp:dbo_editby",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [
+                      {
+                        "name": "field_name",
+                        "value": "id",
+                        "tag": "const",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "field_value",
+                        "value": "conversation_id",
+                        "tag": "input",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "last_message_at",
+                        "value": "now",
+                        "tag": "const",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      }
+                    ],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "dbo": {
+                        "id": "82dcb96c2b194384d632c35b67d6bd52"
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "shared_workspace": {
+          "is_shared": false
+        },
+        "guid": "dd355b0c0de054e837cf0fbdbb7eeea8"
+      }
+    ],
+    "middleware": [],
+    "trigger": [],
+    "task": [],
+    "query": [
+      {
+        "name": "chat/conversations/create",
+        "description": "Create a new conversation owned by the authenticated user",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "title",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Optional thread title. Left blank, the first message's opening words become the title."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "conversation",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "session_token",
+            "name": "mvp:uuid4",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {},
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_add",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "created_at",
+                "value": "now",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "user_id",
+                "value": "id",
+                "tag": "auth",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "title",
+                "value": "title",
+                "tag": "input",
+                "filters": [
+                  {
+                    "name": "substr",
+                    "disabled": false,
+                    "arg": [
+                      {
+                        "value": "0",
+                        "tag": "const:int",
+                        "filters": []
+                      },
+                      {
+                        "value": "60",
+                        "tag": "const:int",
+                        "filters": []
+                      }
+                    ]
+                  }
+                ],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "session_token",
+                "value": "session_token",
+                "tag": "var",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "title",
+                  "children": []
+                },
+                {
+                  "name": "last_message_at",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "07552b101f5c7504c601f071300e1d96"
+      },
+      {
+        "name": "chat/conversations",
+        "description": "List the authenticated user's conversations, most recently active first",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "GET",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "conversations",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "conversations",
+            "name": "mvp:dbo_view",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "title",
+                  "children": []
+                },
+                {
+                  "name": "last_message_at",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "user_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "id",
+                        "tag": "auth",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "return": {
+                "type": "list",
+                "list": {
+                  "distinct": "auto",
+                  "sort": [
+                    {
+                      "sortBy": "last_message_at",
+                      "orderBy": "desc"
+                    },
+                    {
+                      "sortBy": "id",
+                      "orderBy": "desc"
+                    }
+                  ],
+                  "paging": {
+                    "enabled": true,
+                    "page": 1,
+                    "offset": 0,
+                    "per_page": 50,
+                    "metadata": false,
+                    "totals": false
+                  }
+                }
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "462d80d3951173d82fd6af65d2d66226"
+      },
+      {
+        "name": "chat/conversations/{conversation_id}/messages",
+        "description": "Read a conversation's transcript, oldest message first",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "GET",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "messages",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "id",
+                        "tag": "auth",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "recent",
+            "name": "mvp:dbo_view",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "conversation_id",
+                  "children": []
+                },
+                {
+                  "name": "role",
+                  "children": []
+                },
+                {
+                  "name": "content",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "conversation_id",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "return": {
+                "type": "list",
+                "list": {
+                  "distinct": "auto",
+                  "sort": [
+                    {
+                      "sortBy": "created_at",
+                      "orderBy": "desc"
+                    },
+                    {
+                      "sortBy": "id",
+                      "orderBy": "desc"
+                    }
+                  ],
+                  "paging": {
+                    "enabled": true,
+                    "page": 1,
+                    "offset": 0,
+                    "per_page": 100,
+                    "metadata": false,
+                    "totals": false
+                  }
+                }
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "messages",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "recent",
+              "tag": "var",
+              "filters": [
+                {
+                  "name": "reverse",
+                  "disabled": false,
+                  "arg": []
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "3b6c9a03e5e4d27ed093c48d631012f3"
+      },
+      {
+        "name": "chat/conversations/{conversation_id}/send",
+        "description": "Append a message to the conversation and return the agent's reply",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "content",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The user's message. Must be non-empty after trimming."
+          },
+          {
+            "name": "message",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Alias for `content`."
+          },
+          {
+            "name": "prompt",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Alias for `content`."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "reply",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:redis_ratelimit",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "key",
+                "value": "chat:send:",
+                "tag": "const",
+                "filters": [
+                  {
+                    "name": "concat",
+                    "disabled": false,
+                    "arg": [
+                      {
+                        "value": "id",
+                        "tag": "auth",
+                        "filters": []
+                      }
+                    ]
+                  }
+                ],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "max",
+                "value": "20",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "ttl",
+                "value": "60",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "error",
+                "value": "Too many messages. Please wait a moment and try again.",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {},
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "id",
+                        "tag": "auth",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "resolved_turn_content",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "content",
+              "tag": "input",
+              "filters": [
+                {
+                  "name": "first_notempty",
+                  "disabled": false,
+                  "arg": [
+                    {
+                      "value": "message",
+                      "tag": "input",
+                      "filters": []
+                    }
+                  ]
+                },
+                {
+                  "name": "first_notempty",
+                  "disabled": false,
+                  "arg": [
+                    {
+                      "value": "prompt",
+                      "tag": "input",
+                      "filters": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "resolved_turn_content",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "badrequest",
+              "error": {
+                "value": "send: non-empty message content must be provided via `content`, `message`, or `prompt`.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "reply",
+            "name": "mvp:function",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "conversation_id",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "content",
+                "value": "resolved_turn_content",
+                "tag": "var",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "function": {
+                "id": "dd355b0c0de054e837cf0fbdbb7eeea8"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "6a62546cc13071290f173fe1a1bcd5e4"
+      },
+      {
+        "name": "chat/conversations/{conversation_id}",
+        "description": "Delete a conversation and every message in it",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "DELETE",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "const:null",
+            "value": "null",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "id",
+                        "tag": "auth",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:dbo_bulkdelete",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "conversation_id",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:dbo_delby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "7c36dd95cd835b1e074c13e88dfb366f"
+      },
+      {
+        "name": "chat/conversations/{conversation_id}/claim",
+        "description": "Attach an unclaimed guest conversation to the authenticated user",
+        "docs": "",
+        "api_enabled": true,
+        "auth": "b25f08616176d89e63786103b0fc2aa7",
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "session_token",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The guest session token the thread was created with."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "claimed",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                },
+                {
+                  "name": "session_token",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "session_token",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "null",
+                        "tag": "const:null",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "accessdenied",
+              "error": {
+                "value": "This conversation has already been claimed.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "claimed",
+            "name": "mvp:dbo_editby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "user_id",
+                "value": "id",
+                "tag": "auth",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "title",
+                  "children": []
+                },
+                {
+                  "name": "last_message_at",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "04e02365c333576ed8213a47468e5542"
+      },
+      {
+        "name": "chat/guest/conversations/create",
+        "description": "Create an anonymous conversation and return its session token",
+        "docs": "",
+        "api_enabled": true,
+        "auth": false,
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "title",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Optional thread title. Left blank, the first message's opening words become the title."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "id",
+            "tag": "var",
+            "value": "conversation.id",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "created_at",
+            "tag": "var",
+            "value": "conversation.created_at",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "title",
+            "tag": "var",
+            "value": "conversation.title",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "last_message_at",
+            "tag": "var",
+            "value": "conversation.last_message_at",
+            "_xsid": "",
+            "disabled": false
+          },
+          {
+            "filters": [],
+            "name": "session_token",
+            "tag": "var",
+            "value": "session_token",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:redis_ratelimit",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "key",
+                "value": "chat:guest:create:",
+                "tag": "const",
+                "filters": [
+                  {
+                    "name": "concat",
+                    "disabled": false,
+                    "arg": [
+                      {
+                        "value": "$remote_ip",
+                        "tag": "setting",
+                        "filters": []
+                      }
+                    ]
+                  }
+                ],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "max",
+                "value": "20",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "ttl",
+                "value": "60",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "error",
+                "value": "Too many messages. Please wait a moment and try again.",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {},
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "session_token",
+            "name": "mvp:uuid4",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {},
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_add",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "created_at",
+                "value": "now",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "session_token",
+                "value": "session_token",
+                "tag": "var",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "title",
+                "value": "title",
+                "tag": "input",
+                "filters": [
+                  {
+                    "name": "substr",
+                    "disabled": false,
+                    "arg": [
+                      {
+                        "value": "0",
+                        "tag": "const:int",
+                        "filters": []
+                      },
+                      {
+                        "value": "60",
+                        "tag": "const:int",
+                        "filters": []
+                      }
+                    ]
+                  }
+                ],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "title",
+                  "children": []
+                },
+                {
+                  "name": "last_message_at",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "ef0f9e3c48ec40db8a14b9cd611e34a2"
+      },
+      {
+        "name": "chat/guest/conversations/{conversation_id}/messages",
+        "description": "Read a guest conversation's transcript, oldest message first",
+        "docs": "",
+        "api_enabled": true,
+        "auth": false,
+        "response_type": "standard",
+        "verb": "GET",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "session_token",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The token returned when the conversation was created."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "messages",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                },
+                {
+                  "name": "session_token",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "session_token",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "null",
+                        "tag": "const:null",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "accessdenied",
+              "error": {
+                "value": "This conversation now belongs to an account. Sign in to continue it.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "recent",
+            "name": "mvp:dbo_view",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "created_at",
+                  "children": []
+                },
+                {
+                  "name": "conversation_id",
+                  "children": []
+                },
+                {
+                  "name": "role",
+                  "children": []
+                },
+                {
+                  "name": "content",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "conversation_id",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "return": {
+                "type": "list",
+                "list": {
+                  "distinct": "auto",
+                  "sort": [
+                    {
+                      "sortBy": "created_at",
+                      "orderBy": "desc"
+                    },
+                    {
+                      "sortBy": "id",
+                      "orderBy": "desc"
+                    }
+                  ],
+                  "paging": {
+                    "enabled": true,
+                    "page": 1,
+                    "offset": 0,
+                    "per_page": 100,
+                    "metadata": false,
+                    "totals": false
+                  }
+                }
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "messages",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "recent",
+              "tag": "var",
+              "filters": [
+                {
+                  "name": "reverse",
+                  "disabled": false,
+                  "arg": []
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "779b12a0bf221c6b6223cb4edd7f28af"
+      },
+      {
+        "name": "chat/guest/conversations/{conversation_id}/send",
+        "description": "Append a message to a guest conversation and return the agent's reply",
+        "docs": "",
+        "api_enabled": true,
+        "auth": false,
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "session_token",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "content",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "The user's message. Must be non-empty after trimming."
+          },
+          {
+            "name": "message",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Alias for `content`."
+          },
+          {
+            "name": "prompt",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": false,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [
+              {
+                "name": "trim",
+                "disabled": false,
+                "arg": []
+              }
+            ],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": "Alias for `content`."
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "var",
+            "value": "reply",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:redis_ratelimit",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "key",
+                "value": "chat:guest:send:",
+                "tag": "const",
+                "filters": [
+                  {
+                    "name": "concat",
+                    "disabled": false,
+                    "arg": [
+                      {
+                        "value": "$remote_ip",
+                        "tag": "setting",
+                        "filters": []
+                      }
+                    ]
+                  }
+                ],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "max",
+                "value": "20",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "ttl",
+                "value": "60",
+                "tag": "const:int",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "error",
+                "value": "Too many messages. Please wait a moment and try again.",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {},
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                },
+                {
+                  "name": "session_token",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "session_token",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "null",
+                        "tag": "const:null",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "accessdenied",
+              "error": {
+                "value": "This conversation now belongs to an account. Sign in to continue it.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "resolved_turn_content",
+            "name": "mvp:set_var",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "value": "content",
+              "tag": "input",
+              "filters": [
+                {
+                  "name": "first_notempty",
+                  "disabled": false,
+                  "arg": [
+                    {
+                      "value": "message",
+                      "tag": "input",
+                      "filters": []
+                    }
+                  ]
+                },
+                {
+                  "name": "first_notempty",
+                  "disabled": false,
+                  "arg": [
+                    {
+                      "value": "prompt",
+                      "tag": "input",
+                      "filters": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "resolved_turn_content",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "badrequest",
+              "error": {
+                "value": "send: non-empty message content must be provided via `content`, `message`, or `prompt`.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "reply",
+            "name": "mvp:function",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "conversation_id",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "content",
+                "value": "resolved_turn_content",
+                "tag": "var",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "function": {
+                "id": "dd355b0c0de054e837cf0fbdbb7eeea8"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "9c25085d206110865e09a39e13bf00b6"
+      },
+      {
+        "name": "chat/guest/conversations/{conversation_id}/delete",
+        "description": "Delete a guest conversation and every message in it",
+        "docs": "",
+        "api_enabled": true,
+        "auth": false,
+        "response_type": "standard",
+        "verb": "POST",
+        "disabled": false,
+        "app": {
+          "id": "d38a9e1caf83cf798a8883cbb0e83b99"
+        },
+        "cache": {
+          "active": false,
+          "ttl": 3600,
+          "input": true,
+          "auth": true,
+          "datasource": true,
+          "ip": false,
+          "headers": [],
+          "env": []
+        },
+        "output": [],
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "history": {
+          "inherit": true,
+          "enabled": true,
+          "limit": 100
+        },
+        "input": [
+          {
+            "name": "conversation_id",
+            "type": "int",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          },
+          {
+            "name": "session_token",
+            "type": "text",
+            "_xsid": "",
+            "nullable": false,
+            "default": "",
+            "merge": false,
+            "hidden": [],
+            "override": [],
+            "customize": {},
+            "required": true,
+            "values": [],
+            "mode": "",
+            "format": "",
+            "sensitive": false,
+            "list": {
+              "min": "",
+              "max": ""
+            },
+            "vector": {
+              "size": 3
+            },
+            "access": "public",
+            "style": {
+              "type": "single"
+            },
+            "children": [],
+            "methods": [],
+            "market_item": {
+              "id": 0,
+              "version": 0,
+              "guid": ""
+            },
+            "is_settings_registry": false,
+            "description": ""
+          }
+        ],
+        "result": [
+          {
+            "filters": [],
+            "name": "",
+            "tag": "const:null",
+            "value": "null",
+            "_xsid": "",
+            "disabled": false
+          }
+        ],
+        "run": [
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "!=",
+                      "left": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "conversation",
+            "name": "mvp:dbo_getby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [
+                {
+                  "name": "id",
+                  "children": []
+                },
+                {
+                  "name": "user_id",
+                  "children": []
+                },
+                {
+                  "name": "session_token",
+                  "children": []
+                }
+              ],
+              "filters": [],
+              "customize": true
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "session_token",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "session_token",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "notfound",
+              "error": {
+                "value": "Conversation not found.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:precondition",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation",
+                        "tag": "var",
+                        "filters": [
+                          {
+                            "name": "get",
+                            "disabled": false,
+                            "arg": [
+                              {
+                                "value": "user_id",
+                                "tag": "const",
+                                "filters": []
+                              },
+                              {
+                                "value": "null",
+                                "tag": "const:null",
+                                "filters": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "right": {
+                        "operand": "null",
+                        "tag": "const:null",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "error_type": "accessdenied",
+              "error": {
+                "value": "This conversation now belongs to an account. Sign in to continue it.",
+                "tag": "const"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:dbo_bulkdelete",
+            "_xsid": "",
+            "addon": [],
+            "input": [],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "9212556e48dcdde206e1f564d3de8eb3"
+              },
+              "search": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
+                    },
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "conversation_id",
+                        "tag": "col",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "conversation_id",
+                        "tag": "input",
+                        "filters": []
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          },
+          {
+            "as": "",
+            "name": "mvp:dbo_delby",
+            "_xsid": "",
+            "addon": [],
+            "input": [
+              {
+                "name": "field_name",
+                "value": "id",
+                "tag": "const",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              },
+              {
+                "name": "field_value",
+                "value": "conversation_id",
+                "tag": "input",
+                "filters": [],
+                "ignore": false,
+                "expand": false,
+                "children": []
+              }
+            ],
+            "mocks": {},
+            "output": {
+              "items": [],
+              "filters": [],
+              "customize": false
+            },
+            "context": {
+              "dbo": {
+                "id": "82dcb96c2b194384d632c35b67d6bd52"
+              }
+            },
+            "runtime": null,
+            "disabled": false,
+            "description": "",
+            "settings_registry": null
+          }
+        ],
+        "test": [],
+        "example": {},
+        "market_item": {
+          "id": 0,
+          "version": 0,
+          "guid": ""
+        },
+        "guid": "9d0fc8b4db5deff4b8ffb4aefb4ff39a"
+      }
+    ],
+    "tool": [],
+    "prompt": [],
+    "resource": [],
+    "toolset": [
+      {
+        "name": "chatbot_agent",
+        "description": "Conversational assistant. Receives the thread's recent turns as decoded LLM messages and returns the next one.",
+        "instructions": "",
+        "docs": "",
+        "enabled": true,
+        "canonical": "",
+        "spec": "",
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "history": {
+          "inherit": true,
+          "tool_enabled": true,
+          "tool_limit": 100
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "tool": [],
+        "type": "agent",
+        "agent_settings": {
+          "type": "openai",
+          "system_prompt": "You are a golden-fixture assistant.",
+          "max_steps": 5,
+          "prompt_type": "messages",
+          "prompt": "",
+          "prompt_messages": "{{ $args.messages }}",
+          "structuredOutputs": false,
+          "structuredOutputsSchema": [],
+          "configs": {
+            "openai": {
+              "apiKey": "",
+              "model": "gpt-4o",
+              "temperature": 1,
+              "reasoningEffort": "medium",
+              "baseURL": "",
+              "headers": "",
+              "organization": "",
+              "project": "",
+              "compatibility": "strict"
+            }
+          }
+        },
+        "guid": "2d7f6782dc621289c7663157d2df67c5"
+      }
+    ],
+    "app": [
+      {
+        "name": "Chatbot",
+        "description": "Conversational AI endpoints: create and list conversations, read a transcript, and send a message to the agent.",
+        "canonical": "chat",
+        "swagger": false,
+        "api_group_enabled": true,
+        "docs": "",
+        "documentation": {
+          "require_token": false,
+          "token": ""
+        },
+        "middleware": {
+          "pre_customize": false,
+          "post_customize": false,
+          "pre": [],
+          "post": []
+        },
+        "history": {
+          "inherit": false,
+          "query_enabled": false,
+          "query_limit": 100
+        },
+        "tag": [
+          {
+            "tag": "xano:chatbot"
+          }
+        ],
+        "cors": {
+          "mode": "default",
+          "allowOrigins": [],
+          "allowHeaders": [],
+          "allowCredentials": false,
+          "maxAge": 0,
+          "allowMethods": {
+            "delete": false,
+            "get": false,
+            "head": false,
+            "patch": false,
+            "post": false,
+            "put": false
+          }
+        },
+        "guid": "d38a9e1caf83cf798a8883cbb0e83b99"
+      }
+    ],
+    "knowledge": [],
+    "knowledge_file": [],
+    "realtime_server": [],
+    "channel": [],
+    "message": [],
+    "microservice": [],
+    "vault": [],
+    "market_item": [],
+    "run_install": [],
+    "action_package_install": [],
+    "env": [],
+    "workflow_test": [],
+    "service": [],
+    "branch": []
+  },
+  "sig": "ACxzpTXI9zXBtkre55umr8NpJ5w."
+}

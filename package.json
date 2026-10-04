@@ -1,0 +1,88 @@
+{
+  "name": "@xano-sdk/chatbot",
+  "version": "1.0.0",
+  "description": "Plug-and-play Xano AI chatbot (conversation/message tables + a Xano AI agent + chat endpoints) as typed Xano SDK defs.",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Xano",
+  "keywords": [
+    "xano",
+    "xanosdk",
+    "xanoscript",
+    "chatbot",
+    "chat",
+    "ai",
+    "agent",
+    "llm",
+    "conversation",
+    "backend",
+    "codegen"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xanots/chatbot.git"
+  },
+  "homepage": "https://github.com/xanots/chatbot#readme",
+  "bugs": {
+    "url": "https://github.com/xanots/chatbot/issues"
+  },
+  "sideEffects": false,
+  "xanosdk": {
+    "register": "registerChatbot",
+    "returns": "handle",
+    "options": {
+      "authTable": {
+        "package": "@xano-sdk/auth",
+        "export": "userTable"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "README.md",
+    "AGENTS.md",
+    "llms.txt"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "fixture:regen": "tsx scripts/regen-golden.ts",
+    "prepublishOnly": "npm run build",
+    "release": "npm publish --access public",
+    "release:beta": "npm version prerelease --preid=beta -m \"chore(release): %s\" && npm publish --tag beta --access public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@xano/sdk": ">=1.0.0 <2.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@xano/sdk": "1.0.0",
+    "eslint": "^9.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

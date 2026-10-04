@@ -1,0 +1,487 @@
+# @xano-sdk/chatbot
+
+> A conversational AI assistant for Xano as typed Xano SDK defs: `conversation` +
+> `conversation_message` tables, a Xano AI agent, a shared reply function, and the
+> chat endpoints. Point it at your users table, write a system prompt, deploy.
+> For agents working ON this repo, read AGENTS.md instead.
+
+Install: `npm install @xano-sdk/chatbot @xano/sdk`. `@xano/sdk` is a
+`>=1.0.0 <2.0.0` peer dependency; built and tested against **1.0.0**. ESM-only,
+Node >= 20.
+
+## Setup
+
+```ts
+import { workspace } from "@xano/sdk";
+import { userTable } from "@xano-sdk/auth";   // or any table() handle
+import { registerChatbot } from "@xano-sdk/chatbot";
+
+export const bot = registerChatbot(workspace("my-app"), {
+  authTable: userTable,                 // any table() handle or table name
+  llm: { type: "xano-free", systemPrompt: "You are a support agent for Acme." },
+});
+
+export default bot.xano;                // the default export must be the Xano registry
+```
+
+- **`registerChatbot` returns the def set, not the instance.** The instance is on
+  `.xano`. The defs are factories, so this handle is the ONLY route to the
+  registered defs — exporting it is what lets a frontend derive its types from
+  them (see "Typed client" below). Use `createChatbot(opts)` to build without
+  registering.
+- **The families are typed from the options — no `!` needed.**
+  `bot.authenticated` is non-nullable unless you pass `{ authenticated: false }`,
+  and `bot.guest` exists only with `{ guest: true }`:
+
+  ```ts
+  const a = registerChatbot(xano, { authTable });               // a.authenticated.sendMessage ✓  a.guest → undefined
+  const b = registerChatbot(xano, { authTable, guest: true });  // b.guest.sendMessage ✓
+  const c = registerChatbot(xano, { authenticated: false, guest: true });  // c.authenticated → undefined
+  ```
+
+  Only a NON-LITERAL flag (`{ guest: someBoolean }`) stays `… | undefined`,
+  because it is genuinely unknowable at compile time.
+
+- **No dependency on `@xano-sdk/auth`.** `authTable` takes any `table()` handle or
+  bare table name. `table({ auth: true })` is a convention, not a mechanism — the
+  engine gates by comparing the token's table to the endpoint's *by name* and
+  mints a token for any table by name; the flag only drives the editor's picker.
+- A bare-name `authTable` must still be **registered** on the workspace (the SDK
+  errors at export on an unresolvable reference) and needs
+  `{ userIdType: "uuid" }` for a uuid-keyed table, since a name carries no schema.
+  Prefer the handle.
+- A raw numeric `dbo.id` is **rejected**, unlike the SDK's `auth`: the same table is
+  the target of `conversation.user_id`, and `f.tableRef` resolves through
+  `ObjectRef`, which has no numeric form.
+
+## Build a frontend on it — the whole path
+
+Everything below is expanded later; this is the order to do it in.
+
+**1. Generate the routes.** Never import a def into the browser for its
+`getPath()` — the chat endpoints run an AI agent, so importing one drags the SDK
+runtime (~236 kB min / ~62 kB gz) into the bundle. This file imports nothing:
+
+```bash
+npx xanosdk routes ./xano/index.ts --emit xano/routes.gen.ts
+```
+
+**2. Import the types — all type-only, so they erase.**
+
+```ts
+import type {
+  PublicConversation, PublicMessage,      // rows
+  SendMessageBody, ChatReply,             // the one call that matters
+  ListConversationsResponse, ListMessagesResponse,
+} from "@xano-sdk/chatbot";
+import { routePath } from "../xano/routes.gen.js";
+```
+
+**3. Four calls make a chat UI.** Every one takes `Authorization: Bearer <token>`
+for your `authTable`.
+
+| do | call |
+|---|---|
+| list threads | `routePath("GET chat/conversations")` → `ListConversationsResponse` |
+| open a thread | `routePath("POST chat/conversations/create")` → `PublicConversation` |
+| load a thread | `routePath("GET chat/conversations/{conversation_id}/messages", { conversation_id })` → `ListMessagesResponse` |
+| send | `routePath("POST chat/conversations/{conversation_id}/send", { conversation_id })`, body `SendMessageBody` → `ChatReply` |
+
+`SendMessageBody` is `{ content }` — the id rides in the path, not the body.
+
+**4. Render.** Assistant turns as **Markdown with raw HTML disabled**; `role:
+"user"` turns as **plain text**. The reply is model output shaped by user input.
+
+**5. Four behaviours to build around**, each with its own section below:
+
+- **Serialize sends per thread.** Keep one in flight and disable the composer
+  while pending — concurrent sends to one thread scramble it.
+- **Trim before sending.** Whitespace-only content is refused with `400`.
+- **Handle `401` (sign out), `404` (thread gone — `404` *is* the permission
+  failure), `429` (rate limited, back off).**
+- **No pagination and no streaming.** Reads are capped and silently truncated;
+  a reply arrives whole, so show one pending state.
+
+That is the complete contract. Adding `tools` later changes none of it — see
+*What a client sees when a tool runs*.
+
+## Endpoints (default `routePrefix: "chat"`)
+
+Authenticated family (`authenticated: true`, the default; `Authorization: Bearer`,
+scoped to `auth("id")`):
+
+- `POST chat/conversations/create` → the conversation
+- `GET chat/conversations` → the caller's conversations, most recently active first
+- `GET chat/conversations/{conversation_id}/messages` → transcript, oldest first
+- `POST chat/conversations/{conversation_id}/send` `{ content }` →
+  `{ conversation_id, reply, message_id, tool_calls }`
+- `DELETE chat/conversations/{conversation_id}` → `null`
+- `POST chat/conversations/{conversation_id}/claim` `{ session_token }` → the
+  claimed conversation *(only when `guest: true`)*
+
+Guest family (`guest: true`, off by default; public, scoped by `session_token`):
+
+- `POST chat/guest/conversations/create` → the conversation **plus `session_token`**
+- `GET chat/guest/conversations/{conversation_id}/messages`
+- `POST chat/guest/conversations/{conversation_id}/send`
+- `POST chat/guest/conversations/{conversation_id}/delete` *(POST, not DELETE, to
+  keep the token out of the URL)*
+
+**Route names are not RESTful verb pairs.** A verb pair on one name is legal in the
+SDK, but the names cannot change: a query's identity includes its name, so a rename
+moves every endpoint's identity and every consumer's `xano.lock` with it.
+`create` / `send` also read as Xano-idiomatic, the same shape as `auth/signup`.
+
+⚠ In YOUR endpoints, check which SDK version you are on before reaching for a verb pair.
+
+## Options
+
+`authTable` (required unless `authenticated: false`) · `userIdType` (`"int"`) ·
+`authenticated` (`true`) · `guest` (`false`) · `llm` (`{ type: "xano-free" }`) ·
+`historyLimit` (`20`) · `listLimit` (`100`) · `transcriptLimit` (`200`) ·
+`canonical` (unset) · `history` (`false`) · `routePrefix` (`"chat"`) · `names` ·
+`tags` (`["xano:chatbot"]`) · `tools` (`[]`) · `rateLimit` (`{ max: 20, ttl: 60 }`,
+`false` disables).
+
+- **`llm.prompt` / `llm.messages` are refused** at compile time and at runtime.
+  This package owns the run prompt because that is how the transcript reaches the
+  model, and Xano stores ONE prompt behind a `prompt_type` discriminator — a
+  supplied one would replace the history, not add to it. Use `systemPrompt`.
+- **Request history defaults `false`**, against the engine's inherit-on: the
+  request body carries the user's message text and, on the guest family, the
+  `session_token` granting access to the whole thread.
+- **`canonical`** pins the API group's URL segment so `getPath()` resolves with no
+  lock file. Unset, identity comes from `xano.lock` and a bare `getPath()` throws.
+
+## Architecture & Behaviour
+
+- **`messages` template:** Sends structured message objects natively to the model
+  engine rather than interpolating raw text into a prompt, optimizing token usage.
+- **Message validation:** `content` is required (`min: 1`) and automatically trimmed
+  at input; `role` is typed as an enum (`["user", "assistant", "system"]`).
+- **Binary endpoint authentication:** Authenticated endpoints require a valid token,
+  while guest endpoints operate publicly using capability tokens. Separate endpoint
+  families ensure clean security boundaries.
+
+## Factories, not module-level defs
+
+There is no `import { conversationTable }`. `f.tableRef` resolves its target's
+guid eagerly at column-construction time, so a module-level def would bake in one
+auth table forever. Use `createChatbot`, which builds everything and registers
+nothing:
+
+```ts
+const bot = createChatbot({ authTable: userTable });
+xano.registerTables([bot.conversation, bot.message])
+    .registerAgents([bot.agent])
+    .registerFunctions([bot.replyFn])
+    .registerApiGroups([bot.group])
+    .registerQueries([bot.authenticated.sendMessage]);
+```
+
+Dependencies travel together (queries need both tables, the reply function and the
+agent). `registerChatbot(xano, opts)` does all of it and returns the same
+`Chatbot` set with the instance added as `.xano`. Calling it twice on one instance
+throws; two chatbots in one workspace need distinct `routePrefix` **and** `names`.
+
+## Typed client (frontend)
+
+Every request and response type is exported. Import them **type-only** — they
+erase, so nothing reaches the bundle:
+
+```ts
+import type { SendMessageParams, SendMessageBody, ChatReply } from "@xano-sdk/chatbot";
+
+const params: SendMessageParams = { conversation_id: 42 };   // → interpolated into the URL
+const body: SendMessageBody = { content: "Hello" };          // → the JSON body
+```
+
+**Naming rule:** `<HandleName><Part>`, where the handle name is the property on
+`bot.authenticated` / `bot.guest` — `sendMessage` → `SendMessage…`.
+
+| part | is | goes |
+|---|---|---|
+| `…Params` | path parameters | interpolated into the URL |
+| `…Query` | query-string parameters | `?a=b` |
+| `…Body` | the JSON body | the request body |
+| `…Input` | all of the above at once (what the SDK derives) | — |
+| `…Response` | what comes back | — |
+
+A part an endpoint does not take is **not exported**, so the existence of a name
+answers "does this take a body?". Do not send `…Input` as the body — it contains
+the path params, which the endpoint reads off the URL.
+
+### `ChatbotEndpoints` — the whole surface as one map
+
+Keyed by the same names as the def handles, so a client can be written or
+generated from it alone:
+
+```ts
+type Send = ChatbotEndpoints["sendMessage"];
+// verb "POST" · route "conversations/{conversation_id}/send" · auth "token"
+// params { conversation_id } · query never · body { content } · response ChatReply
+```
+
+Keys: `createConversation`, `listConversations`, `listMessages`, `sendMessage`,
+`deleteConversation`, `claimConversation`, and `guestCreateConversation`,
+`guestListMessages`, `guestSendMessage`, `guestDeleteConversation`. Each entry
+carries `verb`, `route` (relative to `routePrefix`), `auth`
+(`"token"` | `"session_token"` | `"none"`), `params`, `query`, `body`, `response`
+— `never` where a part does not apply.
+
+⚠ `session_token` is a bearer capability, and the map records where it travels:
+`guestListMessages` is a GET so it rides in the **query string** (and therefore
+into access logs); `guestDeleteConversation` is a POST **specifically** so it
+rides in the body instead.
+
+⚠ **Do not call `createChatbot()` in browser code to reach a def.** It is a
+runtime call: the `s.*`/`c.*` factories in each stack execute at module load and
+cannot be tree-shaken, so you pay ~236 kB min / ~62 kB gz for a type that erases.
+Import the types above, or `import type` the `bot` handle your `xano/index.ts`
+exports:
+
+```ts
+import type { bot } from "../xano/index.js";        // erases completely
+type Send = typeof bot.authenticated.sendMessage;
+```
+
+For **paths**, do not import defs either — `xanosdk routes <entry> --emit
+xano/routes.gen.ts` emits verbs and paths as plain data that imports nothing.
+
+## Concurrent sends to one thread — serialize client-side
+
+A send operation writes the user turn, retrieves history, executes the AI
+model, and records the assistant reply. Because model generation is asynchronous,
+concurrent sends to the same conversation thread can interleave: multiple user
+turns may be written before an assistant reply returns, causing subsequent model
+calls to see in-flight messages.
+
+**Recommended client practice:** Keep one send request in flight per conversation
+and disable the composer while awaiting a reply.
+
+Transcripts are ordered by `created_at` timestamp rather than auto-incrementing ID.
+
+## Rate limiting — ON by default
+
+The guest family is public and every send invokes an LLM call, so `rateLimit`
+defaults to `{ max: 20, ttl: 60 }` (20 requests per 60s per caller) on the
+endpoints that consume resources: both `send` endpoints and
+`guest/conversations/create`. Reads are not rate-limited.
+
+```ts
+registerChatbot(xano, { authTable, rateLimit: { max: 5, ttl: 30 } });
+registerChatbot(xano, { authTable, rateLimit: false });   // remove it entirely
+```
+
+The rate limiter runs first, before database lookups, so unauthorized probes
+consume only the caller's request budget. Rate limit buckets are namespaced by
+`routePrefix`. Authenticated endpoints key on `auth("id")`, while guest endpoints
+key on `sys.remoteIp()`.
+
+## Limits truncate silently — there is no pagination
+
+No read endpoint paginates. Each caps its result and returns the capped list with
+no cursor or total count:
+
+| option | default | caps | drops |
+|---|---|---|---|
+| `transcriptLimit` | `200` | messages per transcript read | the **oldest** messages |
+| `listLimit` | `100` | conversations per list read | the least recently active |
+| `historyLimit` | `20` | **messages** replayed to the model per send, *including the current one* | the oldest messages |
+
+Consequences to design around:
+- Do not implement pagination controls against these endpoints.
+- `historyLimit` counts messages including the turn being sent. For example, at
+  `historyLimit: 2` the model receives only the previous assistant message and
+  current user message.
+- `historyLimit` is independent of `transcriptLimit`. Raise options in configuration
+  if needed.
+
+## Giving the agent tools
+
+The chat agent is tool-less by default. Pass `tools` to allow the assistant to
+call workspace functions and query external data on demand:
+
+```ts
+import { tool, input, s, inp, ref } from "@xano/sdk";
+
+const orderStatus = tool({
+  name: "order_status",
+  description: "Look up the delivery status of an order by its id.",
+  input: { order_id: input.int({ required: true }) },
+  stack: [s.db.get({ table: orders, fieldName: "id", fieldValue: inp("order_id"), as: "row" })],
+  response: ref("row"),
+});
+
+const bot = registerChatbot(xano, { authTable: userTable, tools: [orderStatus] });
+bot.xano.registerTools([orderStatus]);   // ← REQUIRED: register tools on the workspace
+export default bot.xano;
+```
+
+⚠ **You must register the tool yourself.** This package only references tools.
+Registering them on the workspace ensures proper resolution at deployment.
+
+Key behaviors when adding tools:
+- **`llm.maxSteps`:** Bounds reasoning/tool steps (defaults to `5`).
+- **Tool authorization:** a tool has **no caller identity unless its toolset
+  entry names an auth table**. With `authTable` set, this package gives every
+  entry that names none `auth: <authTable>`, so `auth("id")` inside the tool
+  binds the chatting user. See *Per-tool auth* below before you write `auth()`.
+- **Transcript context:** Tool outputs returned to the model become part of the
+  conversation context. Ensure tools return concise, relevant data.
+
+### Per-tool auth — read this before writing `auth()` in a tool
+
+A toolset entry carries its own `auth`, and the engine's default is
+`auth: false` — a **public** tool stack. `auth("id")` in a public stack does not
+resolve to null; it raises `ERROR_CODE_ACCESS_DENIED` on the first statement
+that reads it, the agent swallows the throw, and the model still answers "I
+saved that note". Nothing is written and nothing fails loudly.
+
+So when `authTable` is set, **this package scopes your tools for you**:
+
+```ts
+tools: [saveNote]                         // → { tool: saveNote, auth: userTable }
+tools: [{ tool: saveNote }]               // → { tool: saveNote, auth: userTable }
+tools: [{ tool: saveNote, auth: other }]  // → left alone
+tools: [{ tool: ping, auth: false }]      // → left PUBLIC — the explicit opt-out
+```
+
+Rules that follow from it:
+
+- **`{ tool, auth: false }` is now the only spelling that produces a public
+  tool.** A tool written that way must not call `auth()`; scope what it reads by
+  the arguments the model supplies.
+- **A guest-only bot** (`{ authenticated: false, guest: true }`) has no auth
+  table, so nothing is scoped and every tool is public. `auth()` cannot work
+  there at all.
+- **Both families at once is a hazard the package cannot resolve.** One agent
+  serves both, and an entry carries one `auth`: a scoped tool has no identity to
+  bind on a public guest send. `createChatbot` warns, and the fix is either
+  `{ tool, auth: false }` plus no `auth()` in the tool, or a second
+  `registerChatbot` install (own `routePrefix` and `names`) for the guest bot.
+
+### What a client sees when a tool runs
+
+**The API contract remains identical.** Whether tools are enabled or not:
+
+| | with tools | without tools |
+|---|---|---|
+| `send` response | `ChatReply` — `{ conversation_id, reply, message_id, tool_calls }` | identical |
+| `reply` | a plain string, still Markdown | identical |
+| `tool_calls` | the **names** of the tools that ran, in call order | always `[]` |
+| transcript rows added per send | **2** — the user turn and the final answer | 2 |
+| tool calls in the transcript | **none** | — |
+
+A client interacting with the chatbot uses the exact same interface: calling
+`send` returns the final answer in `reply`, and the stored transcript contains
+clean user and assistant turns.
+
+`tool_calls` is always an **array of strings**, never null, so
+`reply.tool_calls.length` needs no branch on how the bot was configured. Names
+only, and deliberately: a call record also carries the arguments the model
+produced and whatever the tool returned, which is data no client asked for.
+
+⚠ It is **not an audit log.** It reports which tools the model reached for on
+this run, not which of them succeeded. To know a tool worked, read the rows it
+should have written.
+
+Key considerations when enabling tools:
+- **Execution loop:** The agent loops (calling tools and evaluating responses)
+  until generating a final reply, bounded by `llm.maxSteps` (default `5`). All
+  tool calls complete within the single `send` request.
+- **Latency:** Tool execution adds to request duration. Keep tool functions
+  fast and keep `maxSteps` bounded to your use case.
+- **Client visibility:** `tool_calls` names what ran; the arguments, results and
+  intermediate turns stay server-side and are not written to
+  `conversation_message`.
+- **Security:** Model output remains untrusted content. Keep raw HTML disabled
+  in frontend renderers.
+
+### The model has to be told the tools exist
+
+When `tools` are configured, this package automatically appends instructions to
+the system prompt:
+
+> You have tools available. When a question needs information you do not have,
+> call the appropriate tool rather than guessing or saying you do not know. Use
+> what a tool returns to answer in your own words — never paste the raw tool
+> response or its wrapper into your reply.
+
+This ensures the model proactively executes available tools when needed and
+translates raw tool response structures into natural language replies. Exported
+as `TOOLS_SYSTEM_PROMPT` for reference or reuse.
+
+### Structured output is deliberately not configurable
+
+`AgentDef` supports an `output` schema; this package pins none and exposes no
+option for it. `ChatReply.reply` is declared `string` and the send endpoints hand
+`run.result` straight back, so a structured-output schema would make `.result` an
+object where every consumer's type — and every markdown renderer — expects text.
+
+If you want structured data out of a conversation, give the agent a **tool** that
+records it and keep the reply itself free text. That also keeps the thing the
+user reads and the thing your system stores from competing for one field.
+
+## Errors — what a client must handle
+
+Common HTTP status codes returned by the chatbot endpoints (wrapped in Xano's
+standard `{ code, message, payload? }` envelope):
+
+| status | `code` | when | client should |
+|---|---|---|---|
+| `400` | `ERROR_CODE_INPUT_ERROR` | a required param is absent or empty | fix the request; not retryable |
+| `401` | `ERROR_CODE_UNAUTHORIZED` | no token, or an invalid/expired one (tokens last 24h) | sign the user out and re-authenticate |
+| `403` | `ERROR_CODE_ACCESS_DENIED` | a guest token on a claimed thread; duplicate claim attempt | stop using the session token; prompt to sign in |
+| `404` | `ERROR_CODE_NOT_FOUND` | thread missing, not owned by user, or invalid guest token | treat the thread as unavailable; refresh list |
+| `429` | `ERROR_CODE_TOO_MANY_REQUESTS` | rate limit exceeded | back off and retry after the window |
+| `500` | — | agent execution failure or empty reply | retryable; user turn may already be recorded |
+
+Key behavior notes:
+- **Unified 404s for security:** A missing thread and another user's thread both
+  return `404 Not Found` to prevent ID enumeration.
+- **Empty parameter handling:** Empty strings (`""`) are treated as missing
+  parameters and return `400 Bad Request`.
+- **Automatic trimming:** User message `content` is automatically trimmed before
+  storage and processing. Whitespace-only messages are rejected with `400`.
+
+## Types
+
+`Conversation`, `PublicConversation`, `Message`, `PublicMessage`, `MessageRole`,
+`ChatReply`, plus `ChatbotOptions` / `ChatbotAuthTable` / `ChatbotLlmOptions`. All
+erase at compile time, so a frontend can `import type` them without pulling a def
+into the bundle.
+
+**Render `reply` as Markdown.** Any frontend works, but replies read far better
+rendered than as plain text, so the default system prompt asks the model for light
+markdown (emphasis, lists, fenced code). Use a markdown component
+(`<Markdown>{message.content}</Markdown>`) rather than a text node, or the reader
+sees literal `**asterisks**`. Three caveats:
+
+- The reply is model output shaped by user input, so treat it as **untrusted**:
+  keep raw HTML disabled (the default in `react-markdown`/`marked`) or sanitize
+  before `dangerouslySetInnerHTML`. The prompt telling the model not to emit HTML
+  is a nudge, not a control.
+- Render `role: "user"` turns as **plain text** — those are verbatim user input.
+- Building a plain-text UI? Override `llm.systemPrompt` to drop the formatting
+  instruction, rather than stripping markup client-side.
+
+`ChatReply` is the only **declared** response shape — `reply` is the agent run's
+`.result`, which the SDK resolves to `unknown` because the agent carries no
+structured-output schema. Every other response is derived from its `output` list.
+
+## Read before production
+
+- A guest `session_token` is a **bearer capability**, not an identity: whoever
+  holds it can read and continue that thread. No expiry; claiming a thread is the
+  only thing that ends its authority.
+- **Reads are not rate-limited**; `send` and guest create are (`rateLimit`, on by
+  default). The cap is per caller, not a spend budget — it does not bound what
+  your provider bill can reach.
+- **Nothing here moderates** input or output.
+- Conversations grow without limit; there is no pruning or retention. You own the
+  lifecycle of both tables.
+- A missing thread and someone else's thread both return `notfound`, so ids cannot
+  be enumerated.
+
+Full detail: [README.md](README.md).
