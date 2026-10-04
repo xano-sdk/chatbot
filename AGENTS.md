@@ -410,7 +410,7 @@ Lockstep with the peer. For each SDK bump:
 
 ### Release notes
 
-Start from [.github/RELEASE_TEMPLATE.md](https://github.com/xanots/chatbot/blob/main/.github/RELEASE_TEMPLATE.md) — it carries
+Start from [.github/RELEASE_TEMPLATE.md](https://github.com/xano-sdk/chatbot/blob/main/.github/RELEASE_TEMPLATE.md) — it carries
 the shape and the constraints the Slack announcement imposes, and its guidance
 lives in HTML comments stripped before Slack sees them.
 
@@ -429,7 +429,7 @@ lives in HTML comments stripped before Slack sees them.
 Publishing a release fires `.github/workflows/release-slack.yml`, which runs
 `.github/scripts/test_slack_release_message.py` in the same job that posts, so a
 malformed payload fails the workflow rather than reaching Slack. Both the builder
-and that test are kept identical to `xanots/sdk`'s and `xanots/auth`'s modulo the
+and that test are kept identical to `xano-sdk/sdk-dev`'s and `xano-sdk/auth`'s modulo the
 repo and package names; port fixes between them rather than letting them diverge.
 
 ```bash

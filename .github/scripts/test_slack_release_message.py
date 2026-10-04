@@ -14,8 +14,8 @@ import sys
 
 from slack_release_message import HEADER_LIMIT, SECTION_LIMIT, build, inline
 
-REPO = "xanots/chatbot"
-URL = "https://github.com/xanots/chatbot/releases/tag/v9.9.9"
+REPO = "xano-sdk/chatbot"
+URL = "https://github.com/xano-sdk/chatbot/releases/tag/v9.9.9"
 
 
 def sections(payload: dict) -> list[str]:
