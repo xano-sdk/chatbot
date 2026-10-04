@@ -23,11 +23,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xanots/chatbot.git"
+    "url": "git+https://github.com/xano-sdk/chatbot.git"
   },
-  "homepage": "https://github.com/xanots/chatbot#readme",
+  "homepage": "https://github.com/xano-sdk/chatbot#readme",
   "bugs": {
-    "url": "https://github.com/xanots/chatbot/issues"
+    "url": "https://github.com/xano-sdk/chatbot/issues"
   },
   "sideEffects": false,
   "xanosdk": {
