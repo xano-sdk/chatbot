@@ -435,3 +435,16 @@ repo and package names; port fixes between them rather than letting them diverge
 ```bash
 cd .github/scripts && python3 test_slack_release_message.py
 ```
+
+## The optional frontend (`src/react/`, published as `@xano-sdk/chatbot/react`)
+
+- **Optional and self-contained.** Nothing outside `src/react/` imports it, and it imports nothing from
+  `@xano/sdk` at runtime (`import type` only), nothing from an app, and no packages but React.
+  `test/react-frontend-rules.test.ts` enforces it. React is an optional peer.
+- **The Markdown renderer must never produce HTML strings.** Elements only, with links limited to
+  `http(s)` and `mailto`. `test/react-markdown.test.tsx` holds the injection cases; add one when you
+  widen the syntax.
+- **`useChat` serializes sends itself**, not only through the disabled button. A test calls `send` twice
+  at once.
+- It follows this README's frontend checklist. When an endpoint's shape or an error's meaning changes,
+  update `src/react/client.ts` in the same change.

@@ -98,6 +98,59 @@ text, serialize sends per thread, and handle `401`/`404`/`429`.
 `llms.txt` carries the same path as a single checklist, and each item has a
 section of its own below.
 
+### Or start from the included frontend (optional)
+
+`@xano-sdk/chatbot/react` is a complete, ready-to-use assistant UI built on exactly that checklist. Use it
+as is, or read it as the reference for your own. The backend never depends on it, and React is an
+*optional* peer.
+
+```bash
+npm install react react-dom   # only needed for this entry
+```
+
+```tsx
+import { createChatClient, Chat, ChatWidget } from "@xano-sdk/chatbot/react";
+
+const chatClient = createChatClient({
+  apiBaseUrl: `${XANO_HOST}/api:chat`,   // your backend + /api:<canonical> (routes.gen.ts has it)
+  getToken: () => session.token,            // the signed-in person's token
+});
+
+// a full page: chats down the side (a drawer on a phone), the conversation, the composer
+<Chat client={chatClient} assistantName="Desk assistant"
+  welcome="Ask about your queue, or find a ticket."
+  suggestions={["Summarise my queue", "What's urgent?"]}
+  onUnauthorized={signOut} />
+
+// or a launcher in the corner of any page, opening the person's latest chat
+<ChatWidget client={chatClient} assistantName="Acme help" />
+```
+
+What it already gets right, from the rest of this README:
+
+- **Rendering:** assistant replies are Markdown, through a built-in renderer that builds React elements
+  and never HTML strings. Raw HTML stays text, and only `http(s)`/`mailto` links become links (new tab,
+  `noopener noreferrer`). The person's own turns are plain text.
+- **Sending:** one send in flight per thread; the person's turn shows at once, with a "thinking"
+  indicator. After a `500` it re-reads the transcript, because the turn may already be stored, and gives
+  the typed text back.
+- **Errors:** `401` calls `onUnauthorized`, `404` refreshes the list, and `429` asks the person to wait.
+  Every error is said in plain words.
+- **Tools:** the tools a reply used (`tool_calls`) show as small chips under it.
+- **Chats:** start a new chat, delete with a confirm, search once there are several, and copy a reply.
+- **Composer:** grows as you type. Enter sends, Shift+Enter adds a line, and it's safe for IME typing.
+- **Look:** self-contained, with no app imports and no Markdown or icon packages. It's styled with
+  shadcn/ui's theme tokens, so in a shadcn/Tailwind app it takes your theme and dark mode. With
+  Tailwind v4: `@source "../node_modules/@xano-sdk/chatbot/dist";`.
+
+**Guests** (`registerChatbot(…, { guest: true })`): `createChatClient({ apiBaseUrl, guest: true })`. The
+client keeps each thread's `session_token` in memory, or in sessionStorage with
+`guestStorage: "session"`, and never in localStorage. After sign-in, claim the threads:
+`for (const t of guestClient.guestThreads()) await userClient.claim(t.id, t.session_token)`.
+
+Build your own instead with `useChat(client)` (the state, serialized sends and error handling) and
+`<Thread chat={…} />`, or just `<Markdown text={reply} />`.
+
 ## Endpoints
 
 Paths below assume the default `routePrefix: "chat"`.

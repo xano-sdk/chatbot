@@ -485,3 +485,8 @@ structured-output schema. Every other response is derived from its `output` list
   be enumerated.
 
 Full detail: [README.md](README.md).
+
+## Optional frontend (React): @xano-sdk/chatbot/react
+
+- `createChatClient({ apiBaseUrl: <backend>/api:<chat canonical>, getToken })` (or `{ guest: true }`); `<Chat client assistantName welcome suggestions onUnauthorized />` for a page, `<ChatWidget client assistantName />` for a corner launcher; `useChat(client)` + `<Thread chat />` to build your own; `<Markdown text />` alone.
+- Already does the checklist: Markdown for the assistant (safe, elements only), plain text for the person, serialized sends, 401/404/429/500 handling, tool chips. Tailwind v4: `@source "../node_modules/@xano-sdk/chatbot/dist";`.
