@@ -1,6 +1,6 @@
 {
   "name": "@xano-sdk/chatbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plug-and-play Xano AI chatbot (conversation/message tables + a Xano AI agent + chat endpoints) as typed Xano SDK defs.",
   "type": "module",
   "license": "MIT",
