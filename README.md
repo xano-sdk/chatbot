@@ -126,6 +126,12 @@ const chatClient = createChatClient({
 <ChatWidget client={chatClient} assistantName="Acme help" />
 ```
 
+**Links into your app.** A reply can link to a screen or a record with a path or a hash route
+(`[Approve it](/approvals)`, `[note 5](#notes/5)`). Pass your router's navigate as `onNavigate` and those
+links move within the app (the widget closes first). Links to other sites still open in a new tab, and
+`//host` links are refused. Tell the assistant to link instead of quoting ids: give tools a `link` field
+and say so in the system prompt.
+
 To open it from your own control instead of a floating button (a header "Ask" button, so nothing covers
 the page), pass `launcher="none"` and call `openChatWidget()` from the control.
 

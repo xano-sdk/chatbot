@@ -46,7 +46,7 @@ export function ChatWidget({ client, onUnauthorized, position = "right", launche
             <Button variant="ghost" icon aria-label="New chat" onClick={chat.newChat}><IconPlus /></Button>
             <Button variant="ghost" icon aria-label="Close" onClick={() => setOpen(false)}><IconX /></Button>
           </header>
-          <Thread chat={chat} text={text} autoFocus />
+          <Thread chat={chat} text={{ ...text, onNavigate: text.onNavigate && ((href) => { setOpen(false); text.onNavigate!(href); }) }} autoFocus />
         </div>
       )}
       {launcher === "floating" && <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close the assistant" : `Open ${text.assistantName ?? "the assistant"}`}

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
-import { Markdown } from "./markdown.js";
+import { Markdown, NavigateContext } from "./markdown.js";
 import type { ChatState, ChatTurn } from "./use-chat.js";
 import { IconArrowDown, IconCheck, IconCopy, IconSend, IconSparkle, IconTool } from "./icons.js";
 import { Button, cx } from "./ui.js";
@@ -12,6 +12,11 @@ export interface ThreadText {
   /** One-click starters in the empty state. */
   suggestions?: string[];
   placeholder?: string;
+  /**
+   * Where an in-app link in a reply goes ("/notes/12", "#approvals"): your router's navigate. Without it,
+   * such links are plain links. Teach the assistant to link records (CHATBOT.md) and replies become a way in.
+   */
+  onNavigate?: (href: string) => void;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -104,6 +109,7 @@ export function Thread({ chat, text = {}, autoFocus }: { chat: ChatState; text?:
   const empty = !chat.loadingThread && chat.turns.length === 0 && !chat.sending;
 
   return (
+    <NavigateContext.Provider value={text.onNavigate}>
     <div className="flex min-h-0 flex-1 flex-col">
       <div ref={scroller} role="log" aria-live="polite" aria-busy={chat.sending} data-testid="chat-transcript"
         onScroll={(e) => { const el = e.currentTarget; setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 40); }}
@@ -157,9 +163,10 @@ export function Thread({ chat, text = {}, autoFocus }: { chat: ChatState; text?:
               <IconSend />
             </Button>
           </form>
-          <p className="mt-1.5 text-center text-[0.6875rem] text-muted-foreground">Enter to send · Shift+Enter for a new line · {name} can make mistakes.</p>
+          <p className="mt-1.5 text-center text-[0.6875rem] text-muted-foreground"><span className="hidden sm:inline">Enter to send · Shift+Enter for a new line · </span>{name} can make mistakes.</p>
         </div>
       </div>
     </div>
+      </NavigateContext.Provider>
   );
 }

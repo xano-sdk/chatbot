@@ -1,15 +1,32 @@
 /**
  * A small Markdown renderer for assistant replies, safe by construction: it builds React elements and
  * never HTML strings, so a reply steered by prompt injection cannot put markup or script on the page.
- * Links keep only http(s) and mailto targets and open in a new tab without referrer.
+ * Links keep only http(s) and mailto targets (a new tab, without referrer) and links into the app itself:
+ * a path ("/notes/12") or a hash route ("#approvals"), never "//host". In-app links go through
+ * `onNavigate` when the app gives one (its router), so they never reload the page.
  *
  * Supports what the chatbot's default prompt asks for: paragraphs, **bold**, *italic*, `code`, fenced
  * code blocks, headings, bullet and numbered lists, block quotes, links and horizontal rules. Anything
  * else is shown as text.
  */
-import { Fragment, type ReactNode } from "react";
+import { createContext, Fragment, useContext, type ReactNode } from "react";
 
 const SAFE_URL = /^(https?:\/\/|mailto:)/i;
+/** A path or hash route in this app: "/x", "#x". "//host" (another site) is not. */
+const IN_APP = /^(\/(?!\/)|#)[^\s]*$/;
+
+/** How an in-app link navigates: the app's router (react-router's navigate, say). Absent → a plain link. */
+export const NavigateContext = createContext<((href: string) => void) | undefined>(undefined);
+
+function InAppLink({ href, children }: { href: string; children: ReactNode }) {
+  const navigate = useContext(NavigateContext);
+  return (
+    <a href={href} data-in-app="" className="font-medium text-primary underline underline-offset-2"
+      onClick={(e) => { if (navigate && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); navigate(href); } }}>
+      {children}
+    </a>
+  );
+}
 
 /** Inline spans: code first (its content is literal), then links, bold, italic. */
 export function inline(text: string, key = "i"): ReactNode[] {
@@ -26,6 +43,7 @@ export function inline(text: string, key = "i"): ReactNode[] {
       const href = m[4]!;
       out.push(SAFE_URL.test(href)
         ? <a key={k} href={href} target="_blank" rel="noopener noreferrer nofollow" className="font-medium underline underline-offset-2">{inline(m[3], k)}</a>
+        : IN_APP.test(href) ? <InAppLink key={k} href={href}>{inline(m[3], k)}</InAppLink>
         : <Fragment key={k}>{inline(m[3], k)}</Fragment>);
     } else if (m[5] !== undefined || m[6] !== undefined) out.push(<strong key={k} className="font-semibold">{inline(m[5] ?? m[6]!, k)}</strong>);
     else out.push(<em key={k}>{inline(m[7] ?? m[8]!, k)}</em>);

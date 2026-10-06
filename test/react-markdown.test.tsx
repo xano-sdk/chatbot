@@ -75,3 +75,25 @@ describe("what it never lets through", () => {
     expect(a?.getAttribute("onmouseover") ?? null).toBeNull();
   });
 });
+
+describe("links into the app", () => {
+  it("renders a path or a hash route as an in-app link, and refuses another host", () => {
+    const out = html("[Open note #5](/notes/5) · [Approvals](#approvals) · [evil](//evil.example/x) · [js](javascript:alert(1))").innerHTML;
+    expect(out).toContain('href="/notes/5"');
+    expect(out).toContain('href="#approvals"');
+    expect(out).not.toContain("evil.example");
+    expect(out).not.toContain("javascript:");
+    expect(out).not.toContain('target="_blank" rel="noopener noreferrer nofollow" class="font-medium text-primary');   // in-app links stay in the tab
+  });
+  it("routes an in-app link through the app's navigate, without a reload", async () => {
+    const { NavigateContext } = await import("../src/react/markdown.js");
+    const went: string[] = [];
+    const host = document.createElement("div"); document.body.appendChild(host); root = createRoot(host);
+    act(() => root!.render(<NavigateContext.Provider value={(h) => went.push(h)}><Markdown text="See [note 5](/notes/5)." /></NavigateContext.Provider>));
+    const a = host.querySelector("a[data-in-app]") as HTMLAnchorElement;
+    const ev = new MouseEvent("click", { bubbles: true, cancelable: true });
+    act(() => { a.dispatchEvent(ev); });
+    expect(went).toEqual(["/notes/5"]);
+    expect(ev.defaultPrevented).toBe(true);
+  });
+});
