@@ -98,6 +98,101 @@ text, serialize sends per thread, and handle `401`/`404`/`429`.
 `llms.txt` carries the same path as a single checklist, and each item has a
 section of its own below.
 
+### Or start from the included frontend (optional)
+
+`@xano-sdk/chatbot/react` is a complete, ready-to-use assistant UI built on exactly that checklist. Use it
+as is, or read it as the reference for your own. The backend never depends on it, and React is an
+*optional* peer.
+
+```bash
+npm install react react-dom   # only needed for this entry
+```
+
+```tsx
+import { createChatClient, Chat, ChatWidget } from "@xano-sdk/chatbot/react";
+
+const chatClient = createChatClient({
+  apiBaseUrl: `${XANO_HOST}/api:chat`,   // your backend + /api:<canonical> (routes.gen.ts has it)
+  getToken: () => session.token,            // the signed-in person's token
+});
+
+// a full page: chats down the side (a drawer on a phone), the conversation, the composer
+<Chat client={chatClient} assistantName="Desk assistant"
+  welcome="Ask about your queue, or find a ticket."
+  suggestions={["Summarise my queue", "What's urgent?"]}
+  onUnauthorized={signOut} />
+
+// or a launcher in the corner of any page, opening the person's latest chat
+<ChatWidget client={chatClient} assistantName="Acme help" />
+```
+
+**Links into your app.** A reply can link to a screen or a record with a Markdown link whose target is a
+path (`/approvals`) or a hash route (`#notes/5`). Pass your router's navigate as `onNavigate` and those
+links move within the app (the widget closes first). Links to other sites still open in a new tab, and
+`//host` links are refused. Tell the assistant to link instead of quoting ids: give tools a `link` field
+and say so in the system prompt.
+
+**Follow-ups and decorated replies.** Under the latest reply, `followUps` offers chips to carry on: by
+default the starter `suggestions` not yet asked in this chat. Pass a list, a function of the reply (its
+`tools` say what it was about), or `false`. `decorateReply` changes how a reply shows and adds something
+under it. `@xano-sdk/agents/react`'s `decorateApprovalReply` turns an `approval_id: 12` line into that
+request's approval card, so a person approves right in the chat.
+
+To open it from your own control instead of a floating button (a header "Ask" button, so nothing covers
+the page), pass `launcher="none"` and call `openChatWidget()` from the control.
+
+**Sizes.** The widget opens as a floating panel. People can:
+
+- drag its inner corner to resize it (or focus the corner and use the arrow keys; a double-click resets it);
+- **dock** it down the side of the page, at full height, with a draggable edge;
+- go **full screen**, with their chat list alongside.
+
+The chat-list button switches chats in any size, and the widget remembers the size on this device. On a
+phone it's always full screen. Escape leaves full screen, then closes. `defaultSize="side"` (or `"full"`)
+sets the size it first opens at.
+
+While docked, the widget sets `--chat-dock` (its width) and `data-chat-dock="right"` (or `"left"`) on
+`<html>`. Make room for it so the page stays usable beside the chat:
+
+```css
+@media (min-width: 640px) {
+  html[data-chat-dock="right"] body { padding-right: var(--chat-dock); }
+  html[data-chat-dock="left"] body { padding-left: var(--chat-dock); }
+}
+```
+
+Fixed elements (a sidebar, a sticky header) ignore body padding: give them the same `right`/`left`. An
+in-app link from the docked chat keeps it open, since the page is right beside it.
+
+The launcher sits 1 rem (1.5 rem from `sm`) above the bottom edge, plus `--chat-offset`. Set that CSS
+variable when something else owns the bottom of the screen, such as a phone tab bar:
+`:root { --chat-offset: 3.5rem; }`.
+
+What it already gets right, from the rest of this README:
+
+- **Rendering:** assistant replies are Markdown, through a built-in renderer that builds React elements
+  and never HTML strings. Raw HTML stays text, and only `http(s)`/`mailto` links become links (new tab,
+  `noopener noreferrer`). The person's own turns are plain text.
+- **Sending:** one send in flight per thread; the person's turn shows at once, with a "thinking"
+  indicator. After a `500` it re-reads the transcript, because the turn may already be stored, and gives
+  the typed text back.
+- **Errors:** `401` calls `onUnauthorized`, `404` refreshes the list, and `429` asks the person to wait.
+  Every error is said in plain words.
+- **Tools:** the tools a reply used (`tool_calls`) show as small chips under it.
+- **Chats:** start a new chat, delete with a confirm, search once there are several, and copy a reply.
+- **Composer:** grows as you type. Enter sends, Shift+Enter adds a line, and it's safe for IME typing.
+- **Look:** self-contained, with no app imports and no Markdown or icon packages. It's styled with
+  shadcn/ui's theme tokens, so in a shadcn/Tailwind app it takes your theme and dark mode. With
+  Tailwind v4: `@source "../node_modules/@xano-sdk/chatbot/dist";`.
+
+**Guests** (`registerChatbot(…, { guest: true })`): `createChatClient({ apiBaseUrl, guest: true })`. The
+client keeps each thread's `session_token` in memory, or in sessionStorage with
+`guestStorage: "session"`, and never in localStorage. After sign-in, claim the threads:
+`for (const t of guestClient.guestThreads()) await userClient.claim(t.id, t.session_token)`.
+
+Build your own instead with `useChat(client)` (the state, serialized sends and error handling) and
+`<Thread chat={…} />`, or just `<Markdown text={reply} />`.
+
 ## Endpoints
 
 Paths below assume the default `routePrefix: "chat"`.

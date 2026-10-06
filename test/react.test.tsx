@@ -1,0 +1,364 @@
+// @vitest-environment happy-dom
+/** The optional frontend, rendered in a DOM with `fetch` stubbed at the network boundary. */
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import { Chat, ChatWidget, createChatClient, openChatWidget } from "../src/react/index.js";
+
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+const NOW = Date.now();
+const conv = (id: number, title = "", at = NOW) => ({ id, created_at: at, title, last_message_at: at });
+const msg = (id: number, role: "user" | "assistant", content: string, conversation_id = 1) => ({ id, created_at: NOW + id, conversation_id, role, content });
+
+type Call = { url: string; method: string; body?: any; auth?: string | null };
+type Route = (c: Call) => { status: number; body?: unknown } | Promise<{ status: number; body?: unknown }>;
+function stubFetch(routes: Record<string, Route>) {
+  const calls: Call[] = [];
+  const f = vi.fn(async (url: string, init: RequestInit = {}) => {
+    const call: Call = { url, method: init.method ?? "GET", body: init.body ? JSON.parse(String(init.body)) : undefined,
+      auth: (init.headers as Record<string, string>)?.authorization ?? null };
+    calls.push(call);
+    const path = new URL(url).pathname.replace(/^\/api:[^/]+\/chat/, "");
+    const key = Object.keys(routes).sort((a, b) => Number(b.includes(" ")) - Number(a.includes(" ")))
+      .find((k) => { const [v, p] = k.includes(" ") ? k.split(" ") : [null, k]; return (!v || v === call.method) && p === path; });
+    const r = key ? await routes[key]!(call) : { status: 404, body: { code: "ERROR_CODE_NOT_FOUND", message: `no route ${path}` } };
+    return new Response(r.body === undefined ? "null" : JSON.stringify(r.body), { status: r.status, headers: { "content-type": "application/json" } });
+  });
+  return { fetch: f as unknown as typeof fetch, calls };
+}
+const client = (f: typeof fetch, extra: object = {}) => createChatClient({ apiBaseUrl: "https://x.test/api:chat", getToken: () => "tok", fetch: f, ...extra });
+
+let root: Root | null = null;
+let host: HTMLElement | null = null;
+afterEach(() => { act(() => root?.unmount()); host?.remove(); root = null; });
+async function render(node: React.ReactNode) {
+  host = document.createElement("div");
+  document.body.appendChild(host);
+  root = createRoot(host);
+  await act(async () => { root!.render(node); });
+  await settle();
+  return host;
+}
+const settle = () => act(async () => { await new Promise((r) => setTimeout(r, 20)); });
+const $ = (el: Element, id: string) => el.querySelector(`[data-testid="${id}"]`);
+const $$ = (el: Element, id: string) => [...el.querySelectorAll(`[data-testid="${id}"]`)];
+async function type(el: Element, text: string) {
+  const input = $(el, "chat-input") as HTMLTextAreaElement;
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(input, text);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  return input;
+}
+const press = (input: Element, key: string, shiftKey = false) =>
+  act(async () => { input.dispatchEvent(new KeyboardEvent("keydown", { key, shiftKey, bubbles: true, cancelable: true })); });
+
+describe("the client", () => {
+  it("routes under the prefix, sends the token, and names each failure in plain words", async () => {
+    const { fetch, calls } = stubFetch({ "GET /conversations": () => ({ status: 429, body: { code: "ERROR_CODE_TOO_MANY_REQUESTS" } }) });
+    await expect(client(fetch).list()).rejects.toMatchObject({ status: 429, message: expect.stringMatching(/sending messages quickly/) });
+    expect(calls[0]).toMatchObject({ url: "https://x.test/api:chat/chat/conversations", auth: "Bearer tok" });
+  });
+  it("guest mode keeps each thread's session_token in memory and sends it, never an Authorization header", async () => {
+    const { fetch, calls } = stubFetch({
+      "POST /guest/conversations/create": () => ({ status: 200, body: { ...conv(5), session_token: "cap-5" } }),
+      "POST /guest/conversations/5/send": () => ({ status: 200, body: { conversation_id: 5, reply: "Hi", message_id: 9, tool_calls: [] } }),
+      "GET /guest/conversations/5/messages": () => ({ status: 200, body: [] }),
+    });
+    const c = createChatClient({ apiBaseUrl: "https://x.test/api:chat", guest: true, fetch });
+    const made = await c.create();
+    expect(made).not.toHaveProperty("session_token");      // the capability stays inside the client
+    await c.send(5, "hello");
+    await c.messages(5);
+    expect(calls[1]!.body).toEqual({ content: "hello", session_token: "cap-5" });
+    expect(calls[2]!.url).toContain("?session_token=cap-5");
+    expect(calls.every((x) => x.auth === null)).toBe(true);
+    expect(c.guestThreads()).toEqual([{ id: 5, session_token: "cap-5" }]);
+    expect((await c.list()).map((x) => x.id)).toEqual([5]);
+  });
+  it("claims a guest thread with its token once signed in", async () => {
+    const { fetch, calls } = stubFetch({ "POST /conversations/5/claim": () => ({ status: 200, body: conv(5) }) });
+    await client(fetch).claim(5, "cap-5");
+    expect(calls[0]).toMatchObject({ body: { session_token: "cap-5" }, auth: "Bearer tok" });
+  });
+});
+
+describe("<Chat />", () => {
+  it("starts on a welcome with suggestions; a suggestion creates the thread and sends it", async () => {
+    const { fetch, calls } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [] }),
+      "POST /conversations/create": () => ({ status: 200, body: conv(1) }),
+      "POST /conversations/1/send": () => ({ status: 200, body: { conversation_id: 1, reply: "Your queue has **3** open tickets.", message_id: 2, tool_calls: ["desk_queue_summary"] } }),
+    });
+    const el = await render(<Chat client={client(fetch)} assistantName="Desk assistant" suggestions={["Summarise my queue"]} />);
+    expect($(el, "chat-empty")!.textContent).toContain("Desk assistant");
+    await act(async () => { ($(el, "chat-suggestion") as HTMLButtonElement).click(); });
+    await settle();
+    expect(calls.filter((c) => c.method === "POST").map((c) => c.url.replace("https://x.test/api:chat", ""))).toEqual(["/chat/conversations/create", "/chat/conversations/1/send"]);
+    expect(calls.find((c) => c.url.endsWith("/send"))!.body).toEqual({ content: "Summarise my queue" });
+    expect($(el, "chat-turn-user")!.textContent).toBe("Summarise my queue");
+    const reply = $(el, "chat-turn-assistant")!;
+    expect(reply.querySelector("strong")!.textContent).toBe("3");            // Markdown for the assistant
+    expect($(el, "chat-tool")!.textContent).toContain("desk queue summary"); // which tools ran
+  });
+
+  it("shows the person's turn at once, a thinking indicator, and allows one send at a time", async () => {
+    let release!: () => void;
+    const { fetch, calls } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(1, "Refunds")] }),
+      "GET /conversations/1/messages": () => ({ status: 200, body: [] }),
+      "POST /conversations/1/send": () => new Promise((r) => { release = () => r({ status: 200, body: { conversation_id: 1, reply: "Done.", message_id: 3, tool_calls: [] } }); }),
+    });
+    const el = await render(<Chat client={client(fetch)} />);
+    await act(async () => { ($$(el, "chat-conversation")[0] as HTMLButtonElement).click(); });
+    await settle();
+    const input = await type(el, "**literal** <b>text</b>");
+    await press(input, "Enter");
+    await settle();
+    expect($(el, "chat-turn-user")!.textContent).toBe("**literal** <b>text</b>");    // plain text for the person
+    expect($(el, "chat-turn-user")!.querySelector("strong, b")).toBeNull();
+    expect($(el, "chat-thinking")).not.toBeNull();
+    expect(($(el, "chat-send") as HTMLButtonElement).disabled).toBe(true);
+    await type(el, "second");
+    await press($(el, "chat-input")!, "Enter");
+    expect(calls.filter((c) => c.url.endsWith("/send"))).toHaveLength(1);              // serialized
+    await act(async () => { release(); });
+    await settle();
+    expect($(el, "chat-thinking")).toBeNull();
+    expect($(el, "chat-turn-assistant")!.textContent).toContain("Done.");
+  });
+
+  it("Shift+Enter adds a line instead of sending", async () => {
+    const { fetch, calls } = stubFetch({ "GET /conversations": () => ({ status: 200, body: [] }) });
+    const el = await render(<Chat client={client(fetch)} />);
+    const input = await type(el, "line one");
+    await press(input, "Enter", true);
+    expect(calls.some((c) => c.method === "POST")).toBe(false);
+  });
+
+  it("after a 500 it re-reads the transcript (the turn may be stored) and gives the text back", async () => {
+    const { fetch } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(1, "T")] }),
+      "GET /conversations/1/messages": () => ({ status: 200, body: [msg(1, "user", "hello")] }),
+      "POST /conversations/1/send": () => ({ status: 500, body: { message: "agent failed" } }),
+    });
+    const el = await render(<Chat client={client(fetch)} />);
+    await act(async () => { ($$(el, "chat-conversation")[0] as HTMLButtonElement).click(); });
+    await settle();
+    await press(await type(el, "again"), "Enter");
+    await settle();
+    expect($(el, "chat-problem")!.textContent).toMatch(/couldn't answer/);
+    expect(($(el, "chat-input") as HTMLTextAreaElement).value).toBe("again");
+    expect($$(el, "chat-turn-user").map((t) => t.textContent)).toEqual(["hello"]);
+  });
+
+  it("a 401 calls onUnauthorized", async () => {
+    const onUnauthorized = vi.fn();
+    const { fetch } = stubFetch({ "GET /conversations": () => ({ status: 401, body: {} }) });
+    const el = await render(<Chat client={client(fetch)} onUnauthorized={onUnauthorized} />);
+    expect(onUnauthorized).toHaveBeenCalled();
+    expect($(el, "chat-problem")!.textContent).toMatch(/session ended/);
+  });
+
+  it("deleting a chat asks first", async () => {
+    const { fetch, calls } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(1, "Old thread")] }),
+      "DELETE /conversations/1": () => ({ status: 200, body: null }),
+    });
+    const el = await render(<Chat client={client(fetch)} />);
+    await act(async () => { ($(el, "chat-delete") as HTMLButtonElement).click(); });
+    expect(calls.some((c) => c.method === "DELETE")).toBe(false);
+    expect([...el.querySelectorAll("dialog")].some((d) => d.textContent!.includes("Old thread"))).toBe(true);
+    await act(async () => { ($(el, "confirm-action") as HTMLButtonElement).click(); });
+    await settle();
+    expect(calls.some((c) => c.method === "DELETE" && c.url.endsWith("/conversations/1"))).toBe(true);
+    expect($$(el, "chat-conversation")).toHaveLength(0);
+  });
+});
+
+describe("<ChatWidget />", () => {
+  it("opens on the latest chat and closes on Escape", async () => {
+    const { fetch } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest"), conv(1, "Older", NOW - 1000)] }),
+      "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "hi", 2), msg(2, "assistant", "Hello!", 2)] }),
+    });
+    const el = await render(<ChatWidget client={client(fetch)} assistantName="Acme help" />);
+    expect($(el, "chat-widget-panel")).toBeNull();
+    await act(async () => { ($(el, "chat-widget-launcher") as HTMLButtonElement).click(); });
+    await settle();
+    expect($(el, "chat-widget-panel")!.getAttribute("aria-label")).toBe("Acme help");
+    expect($(el, "chat-turn-assistant")!.textContent).toContain("Hello!");
+    await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+    expect($(el, "chat-widget-panel")).toBeNull();
+  });  it("launcher=\"none\" floats nothing; openChatWidget() opens and closes it from your own button", async () => {
+    const { fetch } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [] }),
+    });
+    const el = await render(<ChatWidget client={client(fetch)} assistantName="Acme help" launcher="none" />);
+    expect($(el, "chat-widget-launcher")).toBeNull();
+    await act(async () => { openChatWidget(); });
+    await settle();
+    expect($(el, "chat-widget-panel")).not.toBeNull();
+    await act(async () => { openChatWidget(); });
+    expect($(el, "chat-widget-panel")).toBeNull();
+  });
+
+  describe("sizes", () => {
+    afterEach(() => localStorage.clear());
+    const routes = () => stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest"), conv(1, "Older", NOW - 1000)] }),
+      "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "hi", 2), msg(2, "assistant", "Hello!", 2)] }),
+      "GET /conversations/1/messages": () => ({ status: 200, body: [msg(3, "user", "old question", 1), msg(4, "assistant", "Old answer", 1)] }),
+    });
+    const open = async (node: React.ReactNode) => {
+      const el = await render(node);
+      await act(async () => { openChatWidget(); });
+      await settle();
+      return el;
+    };
+    const click = (el: Element, id: string) => act(async () => { ($(el, id) as HTMLButtonElement).click(); });
+    const panel = (el: Element) => $(el, "chat-widget-panel") as HTMLElement;
+
+    it("goes full screen with the chat list, keeps the draft, and Escape steps back before it closes", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect(panel(el).dataset.size).toBe("panel");
+      expect($(panel(el), "chat-sidebar")).toBeNull();
+      await type(el, "half a thought");
+      await click(el, "chat-widget-full");
+      expect(panel(el).dataset.size).toBe("full");
+      expect($(panel(el), "chat-sidebar")).not.toBeNull();
+      expect(($(el, "chat-input") as HTMLTextAreaElement).value).toBe("half a thought");
+      await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+      expect(panel(el).dataset.size).toBe("panel");
+      await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+      expect(panel(el)).toBeNull();
+    });
+
+    it("docks to the side, leaving --chat-dock for the page, and remembers the choice", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      await click(el, "chat-widget-dock");
+      expect(panel(el).dataset.size).toBe("side");
+      expect(document.documentElement.style.getPropertyValue("--chat-dock")).toBe("440px");
+      expect(document.documentElement.dataset.chatDock).toBe("right");
+      expect(JSON.parse(localStorage.getItem("xano-chat:layout")!)).toMatchObject({ size: "side" });
+      await act(async () => { openChatWidget(); });
+      expect(document.documentElement.style.getPropertyValue("--chat-dock")).toBe("");
+      act(() => root?.unmount()); host?.remove(); root = null;
+      const again = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect(panel(again).dataset.size).toBe("side");
+      await click(again, "chat-widget-float");
+      expect(panel(again).dataset.size).toBe("panel");
+    });
+
+    it("resizes from the handle by pointer and by keyboard, within limits, and a double-click resets", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      const handle = $(el, "chat-widget-resize") as HTMLElement;
+      const width = () => panel(el).style.getPropertyValue("--chat-w");
+      const height = () => panel(el).style.getPropertyValue("--chat-h");
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 0, clientX: 600, clientY: 300, pointerId: 1 })); });
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: 500, clientY: 280, pointerId: 1 })); });
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, clientX: 500, clientY: 280, pointerId: 1 })); });
+      expect(width()).toBe("500px");
+      expect(height()).toBe("660px");
+      expect(JSON.parse(localStorage.getItem("xano-chat:layout")!)).toMatchObject({ w: 500, h: 660 });
+      await act(async () => { handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })); });
+      expect(width()).toBe("468px");
+      for (let i = 0; i < 10; i++) await act(async () => { handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })); });
+      expect(width()).toBe("340px");
+      await act(async () => { handle.dispatchEvent(new MouseEvent("dblclick", { bubbles: true })); });
+      expect(width()).toBe("400px");
+      expect(height()).toBe("640px");
+    });
+
+    it("switches chats from the panel's chat list", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect($(el, "chat-turn-assistant")!.textContent).toContain("Hello!");
+      await click(el, "chat-widget-history");
+      const items = $$(el, "chat-conversation") as HTMLButtonElement[];
+      expect(items.map((b) => b.textContent)).toEqual([expect.stringContaining("Latest"), expect.stringContaining("Older")]);
+      await act(async () => { items[1]!.click(); });
+      await settle();
+      expect($(el, "chat-widget-chats")).toBeNull();
+      expect($(el, "chat-turn-assistant")!.textContent).toContain("Old answer");
+    });
+
+    it("stays open on an in-app link when docked, and closes for one from the panel", async () => {
+      const go = vi.fn();
+      const fetch = stubFetch({
+        "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest")] }),
+        "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "hi", 2), msg(2, "assistant", "See [the note](/notes/5).", 2)] }),
+      }).fetch;
+      const el = await open(<ChatWidget client={client(fetch)} launcher="none" defaultSize="side" onNavigate={go} />);
+      await act(async () => { (panel(el).querySelector("a[href='/notes/5']") as HTMLAnchorElement).click(); });
+      expect(go).toHaveBeenCalledWith("/notes/5");
+      expect(panel(el)).not.toBeNull();
+      await click(el, "chat-widget-float");
+      await act(async () => { (panel(el).querySelector("a[href='/notes/5']") as HTMLAnchorElement).click(); });
+      expect(panel(el)).toBeNull();
+    });
+  });
+});
+
+describe("useChat", () => {
+  it("serializes sends itself, whatever the UI does (two calls at once → one request)", async () => {
+    const { useChat } = await import("../src/react/index.js");
+    let release!: () => void;
+    const { fetch, calls } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(1, "T")] }),
+      "GET /conversations/1/messages": () => ({ status: 200, body: [] }),
+      "POST /conversations/1/send": () => new Promise((r) => { release = () => r({ status: 200, body: { conversation_id: 1, reply: "ok", message_id: 2, tool_calls: [] } }); }),
+    });
+    let chat!: ReturnType<typeof useChat>;
+    const c = client(fetch);
+    function Probe() { chat = useChat(c, { openLatest: true }); return null; }
+    await render(<Probe />);
+    let results!: boolean[];
+    await act(async () => {
+      const both = Promise.all([chat.send("one"), chat.send("two")]);
+      await new Promise((r) => setTimeout(r, 10));
+      release();
+      results = await both;
+    });
+    expect(calls.filter((x) => x.url.endsWith("/send"))).toHaveLength(1);
+    expect(results.sort()).toEqual([false, true]);
+  });
+});
+
+describe("after a reply", () => {
+  const open = async (node: React.ReactElement) => {
+    const el = await render(node);
+    await act(async () => { openChatWidget(); });
+    await settle();
+    return el;
+  };
+  const routes = () => stubFetch({
+    "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest")] }),
+    "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "What's waiting?", 2), msg(2, "assistant", "One request.\napproval_id: 7", 2)] }),
+    "POST /conversations/2/send": () => ({ status: 200, body: { conversation_id: 2, reply: "Sure.", message_id: 4, tool_calls: [] } }),
+  });
+  it("offers the starter questions not asked yet, and a tap sends one", async () => {
+    const { fetch, calls } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none" suggestions={["What's waiting?", "Show my drafts", "Who can change roles?"]} />);
+    const chips = [...el.querySelectorAll('[data-testid="chat-follow-up"]')].map((b) => b.textContent);
+    expect(chips).toEqual(["Show my drafts", "Who can change roles?"]);
+    await act(async () => { (el.querySelector('[data-testid="chat-follow-up"]') as HTMLButtonElement).click(); });
+    await settle();
+    expect(calls.some((c) => c.method === "POST" && c.url.endsWith("/conversations/2/send") && c.body?.content === "Show my drafts")).toBe(true);
+  });
+  it("takes follow-ups from a function of the reply, or none with false", async () => {
+    const { fetch } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none" followUps={(r) => (r.content.includes("request") ? ["Approve it"] : [])} />);
+    expect([...el.querySelectorAll('[data-testid="chat-follow-up"]')].map((b) => b.textContent)).toEqual(["Approve it"]);
+    act(() => root?.unmount()); document.body.innerHTML = "";
+    const el2 = await open(<ChatWidget client={client(routes().fetch)} launcher="none" suggestions={["Show my drafts"]} followUps={false} />);
+    expect(el2.querySelector('[data-testid="chat-follow-up"]')).toBeNull();
+  });
+  it("decorateReply rewrites what shows and adds under it", async () => {
+    const { fetch } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none"
+      decorateReply={(r) => (/approval_id/.test(r.content) ? { content: r.content.replace(/\n?approval_id: \d+/, ""), after: <b data-x="card">card 7</b> } : null)} />);
+    const reply = el.querySelector('[data-testid="chat-turn-assistant"]')!;
+    expect(reply.textContent).not.toContain("approval_id");
+    expect(reply.querySelector('[data-x="card"]')!.textContent).toBe("card 7");
+  });
+});
