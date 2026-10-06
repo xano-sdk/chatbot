@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Markdown, NavigateContext } from "./markdown.js";
 import type { ChatState, ChatTurn } from "./use-chat.js";
 import { IconArrowDown, IconCheck, IconCopy, IconSend, IconSparkle, IconTool } from "./icons.js";
@@ -17,6 +17,16 @@ export interface ThreadText {
    * such links are plain links. Teach the assistant to link records (CHATBOT.md) and replies become a way in.
    */
   onNavigate?: (href: string) => void;
+  /**
+   * Chips under the latest reply, to carry on in one tap. A list, or a function of that reply (its `tools`
+   * say what it was about). Default: the starter `suggestions` not yet asked in this chat. `false`: none.
+   */
+  followUps?: string[] | ((reply: ChatTurn) => string[]) | false;
+  /**
+   * Change how a reply shows, and add something under it: `@xano-sdk/agents`' `decorateApprovalReply`
+   * turns an `approval_id: 12` line into the approval card, decided right there.
+   */
+  decorateReply?: (reply: ChatTurn) => { content?: string; after?: ReactNode } | null | undefined;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -30,7 +40,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function Turn({ turn, name }: { turn: ChatTurn; name: string }) {
+function Turn({ turn, name, decorate }: { turn: ChatTurn; name: string; decorate?: ThreadText["decorateReply"] }) {
   if (turn.role === "user") {
     return (
       <div className="flex justify-end" data-testid="chat-turn-user">
@@ -41,19 +51,22 @@ function Turn({ turn, name }: { turn: ChatTurn; name: string }) {
       </div>
     );
   }
+  const extra = decorate?.(turn) ?? null;
+  const content = extra?.content ?? turn.content;
   return (
     <div className="group flex gap-3" data-testid="chat-turn-assistant">
       <div aria-hidden className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-muted text-foreground"><IconSparkle /></div>
       <div className="min-w-0 flex-1">
         <div className="sr-only">{name} said:</div>
-        <Markdown text={turn.content} className="text-[0.875rem] break-words" />
+        <Markdown text={content} className="text-[0.875rem] break-words" />
+        {extra?.after && <div className="mt-3" data-testid="chat-reply-extra">{extra.after}</div>}
         <div className="mt-1 flex flex-wrap items-center gap-1.5">
           {(turn.tools ?? []).map((t, i) => (
             <span key={`${t}-${i}`} className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.6875rem] text-muted-foreground" data-testid="chat-tool">
               <IconTool width={12} height={12} />{t.replace(/_/g, " ")}
             </span>
           ))}
-          <CopyButton text={turn.content} />
+          <CopyButton text={content} />
         </div>
       </div>
     </div>
@@ -134,9 +147,25 @@ export function Thread({ chat, text = {}, autoFocus }: { chat: ChatState; text?:
               )}
             </div>
           ) : (
-            chat.turns.map((t) => <Turn key={t.id} turn={t} name={name} />)
+            chat.turns.map((t) => <Turn key={t.id} turn={t} name={name} decorate={text.decorateReply} />)
           )}
           {chat.sending && <Thinking name={name} />}
+          {!chat.sending && !chat.loadingThread && (() => {
+            const last = chat.turns[chat.turns.length - 1];
+            if (!last || last.role !== "assistant" || last.pending || text.followUps === false) return null;
+            const asked = new Set(chat.turns.filter((t) => t.role === "user").map((t) => t.content.trim().toLowerCase()));
+            const list = (typeof text.followUps === "function" ? text.followUps(last) : text.followUps ?? text.suggestions ?? [])
+              .filter((s) => !asked.has(s.trim().toLowerCase())).slice(0, 3);
+            if (!list.length) return null;
+            return (
+              <div className="flex flex-wrap gap-2 pl-10" aria-label="Suggested next questions">
+                {list.map((s) => (
+                  <button key={s} type="button" onClick={() => void submit(s)} data-testid="chat-follow-up"
+                    className="rounded-full border px-3 py-1 text-left text-[0.8125rem] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{s}</button>
+                ))}
+              </div>
+            );
+          })()}
         </div>
         {!atBottom && (
           <button type="button" aria-label="Jump to the latest message" onClick={() => { setAtBottom(true); }}

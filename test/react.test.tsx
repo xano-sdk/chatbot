@@ -228,3 +228,42 @@ describe("useChat", () => {
     expect(results.sort()).toEqual([false, true]);
   });
 });
+
+describe("after a reply", () => {
+  const open = async (node: React.ReactElement) => {
+    const el = await render(node);
+    await act(async () => { openChatWidget(); });
+    await settle();
+    return el;
+  };
+  const routes = () => stubFetch({
+    "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest")] }),
+    "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "What's waiting?", 2), msg(2, "assistant", "One request.\napproval_id: 7", 2)] }),
+    "POST /conversations/2/send": () => ({ status: 200, body: { conversation_id: 2, reply: "Sure.", message_id: 4, tool_calls: [] } }),
+  });
+  it("offers the starter questions not asked yet, and a tap sends one", async () => {
+    const { fetch, calls } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none" suggestions={["What's waiting?", "Show my drafts", "Who can change roles?"]} />);
+    const chips = [...el.querySelectorAll('[data-testid="chat-follow-up"]')].map((b) => b.textContent);
+    expect(chips).toEqual(["Show my drafts", "Who can change roles?"]);
+    await act(async () => { (el.querySelector('[data-testid="chat-follow-up"]') as HTMLButtonElement).click(); });
+    await settle();
+    expect(calls.some((c) => c.method === "POST" && c.url.endsWith("/conversations/2/send") && c.body?.content === "Show my drafts")).toBe(true);
+  });
+  it("takes follow-ups from a function of the reply, or none with false", async () => {
+    const { fetch } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none" followUps={(r) => (r.content.includes("request") ? ["Approve it"] : [])} />);
+    expect([...el.querySelectorAll('[data-testid="chat-follow-up"]')].map((b) => b.textContent)).toEqual(["Approve it"]);
+    act(() => root?.unmount()); document.body.innerHTML = "";
+    const el2 = await open(<ChatWidget client={client(routes().fetch)} launcher="none" suggestions={["Show my drafts"]} followUps={false} />);
+    expect(el2.querySelector('[data-testid="chat-follow-up"]')).toBeNull();
+  });
+  it("decorateReply rewrites what shows and adds under it", async () => {
+    const { fetch } = routes();
+    const el = await open(<ChatWidget client={client(fetch)} launcher="none"
+      decorateReply={(r) => (/approval_id/.test(r.content) ? { content: r.content.replace(/\n?approval_id: \d+/, ""), after: <b data-x="card">card 7</b> } : null)} />);
+    const reply = el.querySelector('[data-testid="chat-turn-assistant"]')!;
+    expect(reply.textContent).not.toContain("approval_id");
+    expect(reply.querySelector('[data-x="card"]')!.textContent).toBe("card 7");
+  });
+});

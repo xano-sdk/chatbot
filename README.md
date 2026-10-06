@@ -126,11 +126,17 @@ const chatClient = createChatClient({
 <ChatWidget client={chatClient} assistantName="Acme help" />
 ```
 
-**Links into your app.** A reply can link to a screen or a record with a path or a hash route
-(`[Approve it](/approvals)`, `[note 5](#notes/5)`). Pass your router's navigate as `onNavigate` and those
+**Links into your app.** A reply can link to a screen or a record with a Markdown link whose target is a
+path (`/approvals`) or a hash route (`#notes/5`). Pass your router's navigate as `onNavigate` and those
 links move within the app (the widget closes first). Links to other sites still open in a new tab, and
 `//host` links are refused. Tell the assistant to link instead of quoting ids: give tools a `link` field
 and say so in the system prompt.
+
+**Follow-ups and decorated replies.** Under the latest reply, `followUps` offers chips to carry on: by
+default the starter `suggestions` not yet asked in this chat. Pass a list, a function of the reply (its
+`tools` say what it was about), or `false`. `decorateReply` changes how a reply shows and adds something
+under it. `@xano-sdk/agents/react`'s `decorateApprovalReply` turns an `approval_id: 12` line into that
+request's approval card, so a person approves right in the chat.
 
 To open it from your own control instead of a floating button (a header "Ask" button, so nothing covers
 the page), pass `launcher="none"` and call `openChatWidget()` from the control.
