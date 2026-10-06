@@ -126,6 +126,9 @@ const chatClient = createChatClient({
 <ChatWidget client={chatClient} assistantName="Acme help" />
 ```
 
+To open it from your own control instead of a floating button (a header "Ask" button, so nothing covers
+the page), pass `launcher="none"` and call `openChatWidget()` from the control.
+
 The launcher sits 1 rem (1.5 rem from `sm`) above the bottom edge, plus `--chat-offset`. Set that CSS
 variable when something else owns the bottom of the screen, such as a phone tab bar:
 `:root { --chat-offset: 3.5rem; }`.

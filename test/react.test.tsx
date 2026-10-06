@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { Chat, ChatWidget, createChatClient } from "../src/react/index.js";
+import { Chat, ChatWidget, createChatClient, openChatWidget } from "../src/react/index.js";
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 const NOW = Date.now();
@@ -189,6 +189,17 @@ describe("<ChatWidget />", () => {
     expect($(el, "chat-widget-panel")!.getAttribute("aria-label")).toBe("Acme help");
     expect($(el, "chat-turn-assistant")!.textContent).toContain("Hello!");
     await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+    expect($(el, "chat-widget-panel")).toBeNull();
+  });  it("launcher=\"none\" floats nothing; openChatWidget() opens and closes it from your own button", async () => {
+    const { fetch } = stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [] }),
+    });
+    const el = await render(<ChatWidget client={client(fetch)} assistantName="Acme help" launcher="none" />);
+    expect($(el, "chat-widget-launcher")).toBeNull();
+    await act(async () => { openChatWidget(); });
+    await settle();
+    expect($(el, "chat-widget-panel")).not.toBeNull();
+    await act(async () => { openChatWidget(); });
     expect($(el, "chat-widget-panel")).toBeNull();
   });
 });
