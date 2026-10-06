@@ -15,6 +15,7 @@ export { useChat } from "./use-chat.js";
 export type { ChatState, ChatTurn, ChatProblem, UseChatOptions } from "./use-chat.js";
 export { Chat } from "./chat.js";
 export { ChatWidget, openChatWidget } from "./widget.js";
+export type { ChatWidgetSize } from "./widget.js";
 export { Thread } from "./thread.js";
 export type { ThreadText } from "./thread.js";
 export { Markdown } from "./markdown.js";

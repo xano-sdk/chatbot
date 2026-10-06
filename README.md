@@ -141,6 +141,29 @@ request's approval card, so a person approves right in the chat.
 To open it from your own control instead of a floating button (a header "Ask" button, so nothing covers
 the page), pass `launcher="none"` and call `openChatWidget()` from the control.
 
+**Sizes.** The widget opens as a floating panel. People can:
+
+- drag its inner corner to resize it (or focus the corner and use the arrow keys; a double-click resets it);
+- **dock** it down the side of the page, at full height, with a draggable edge;
+- go **full screen**, with their chat list alongside.
+
+The chat-list button switches chats in any size, and the widget remembers the size on this device. On a
+phone it's always full screen. Escape leaves full screen, then closes. `defaultSize="side"` (or `"full"`)
+sets the size it first opens at.
+
+While docked, the widget sets `--chat-dock` (its width) and `data-chat-dock="right"` (or `"left"`) on
+`<html>`. Make room for it so the page stays usable beside the chat:
+
+```css
+@media (min-width: 640px) {
+  html[data-chat-dock="right"] body { padding-right: var(--chat-dock); }
+  html[data-chat-dock="left"] body { padding-left: var(--chat-dock); }
+}
+```
+
+Fixed elements (a sidebar, a sticky header) ignore body padding: give them the same `right`/`left`. An
+in-app link from the docked chat keeps it open, since the page is right beside it.
+
 The launcher sits 1 rem (1.5 rem from `sm`) above the bottom edge, plus `--chat-offset`. Set that CSS
 variable when something else owns the bottom of the screen, such as a phone tab bar:
 `:root { --chat-offset: 3.5rem; }`.

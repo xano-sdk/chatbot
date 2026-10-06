@@ -7,7 +7,8 @@ import { Ago, Button, ConfirmDialog, cx } from "./ui.js";
 
 const label = (c: PublicConversation) => c.title?.trim() || "New conversation";
 
-function Sidebar({ chat, onPick, onNew }: { chat: ReturnType<typeof useChat>; onPick: (id: number) => void; onNew: () => void }) {
+/** The chat list: New chat, search past five, pick, delete. Shared by <Chat> and the widget. */
+export function Sidebar({ chat, onPick, onNew }: { chat: ReturnType<typeof useChat>; onPick: (id: number) => void; onNew: () => void }) {
   const [q, setQ] = useState("");
   const [deleting, setDeleting] = useState<PublicConversation | null>(null);
   const shown = useMemo(() => (chat.conversations ?? []).filter((c) => label(c).toLowerCase().includes(q.trim().toLowerCase())), [chat.conversations, q]);

@@ -202,6 +202,101 @@ describe("<ChatWidget />", () => {
     await act(async () => { openChatWidget(); });
     expect($(el, "chat-widget-panel")).toBeNull();
   });
+
+  describe("sizes", () => {
+    afterEach(() => localStorage.clear());
+    const routes = () => stubFetch({
+      "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest"), conv(1, "Older", NOW - 1000)] }),
+      "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "hi", 2), msg(2, "assistant", "Hello!", 2)] }),
+      "GET /conversations/1/messages": () => ({ status: 200, body: [msg(3, "user", "old question", 1), msg(4, "assistant", "Old answer", 1)] }),
+    });
+    const open = async (node: React.ReactNode) => {
+      const el = await render(node);
+      await act(async () => { openChatWidget(); });
+      await settle();
+      return el;
+    };
+    const click = (el: Element, id: string) => act(async () => { ($(el, id) as HTMLButtonElement).click(); });
+    const panel = (el: Element) => $(el, "chat-widget-panel") as HTMLElement;
+
+    it("goes full screen with the chat list, keeps the draft, and Escape steps back before it closes", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect(panel(el).dataset.size).toBe("panel");
+      expect($(panel(el), "chat-sidebar")).toBeNull();
+      await type(el, "half a thought");
+      await click(el, "chat-widget-full");
+      expect(panel(el).dataset.size).toBe("full");
+      expect($(panel(el), "chat-sidebar")).not.toBeNull();
+      expect(($(el, "chat-input") as HTMLTextAreaElement).value).toBe("half a thought");
+      await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+      expect(panel(el).dataset.size).toBe("panel");
+      await act(async () => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
+      expect(panel(el)).toBeNull();
+    });
+
+    it("docks to the side, leaving --chat-dock for the page, and remembers the choice", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      await click(el, "chat-widget-dock");
+      expect(panel(el).dataset.size).toBe("side");
+      expect(document.documentElement.style.getPropertyValue("--chat-dock")).toBe("440px");
+      expect(document.documentElement.dataset.chatDock).toBe("right");
+      expect(JSON.parse(localStorage.getItem("xano-chat:layout")!)).toMatchObject({ size: "side" });
+      await act(async () => { openChatWidget(); });
+      expect(document.documentElement.style.getPropertyValue("--chat-dock")).toBe("");
+      act(() => root?.unmount()); host?.remove(); root = null;
+      const again = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect(panel(again).dataset.size).toBe("side");
+      await click(again, "chat-widget-float");
+      expect(panel(again).dataset.size).toBe("panel");
+    });
+
+    it("resizes from the handle by pointer and by keyboard, within limits, and a double-click resets", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      const handle = $(el, "chat-widget-resize") as HTMLElement;
+      const width = () => panel(el).style.getPropertyValue("--chat-w");
+      const height = () => panel(el).style.getPropertyValue("--chat-h");
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 0, clientX: 600, clientY: 300, pointerId: 1 })); });
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: 500, clientY: 280, pointerId: 1 })); });
+      await act(async () => { handle.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, clientX: 500, clientY: 280, pointerId: 1 })); });
+      expect(width()).toBe("500px");
+      expect(height()).toBe("660px");
+      expect(JSON.parse(localStorage.getItem("xano-chat:layout")!)).toMatchObject({ w: 500, h: 660 });
+      await act(async () => { handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })); });
+      expect(width()).toBe("468px");
+      for (let i = 0; i < 10; i++) await act(async () => { handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })); });
+      expect(width()).toBe("340px");
+      await act(async () => { handle.dispatchEvent(new MouseEvent("dblclick", { bubbles: true })); });
+      expect(width()).toBe("400px");
+      expect(height()).toBe("640px");
+    });
+
+    it("switches chats from the panel's chat list", async () => {
+      const el = await open(<ChatWidget client={client(routes().fetch)} launcher="none" />);
+      expect($(el, "chat-turn-assistant")!.textContent).toContain("Hello!");
+      await click(el, "chat-widget-history");
+      const items = $$(el, "chat-conversation") as HTMLButtonElement[];
+      expect(items.map((b) => b.textContent)).toEqual([expect.stringContaining("Latest"), expect.stringContaining("Older")]);
+      await act(async () => { items[1]!.click(); });
+      await settle();
+      expect($(el, "chat-widget-chats")).toBeNull();
+      expect($(el, "chat-turn-assistant")!.textContent).toContain("Old answer");
+    });
+
+    it("stays open on an in-app link when docked, and closes for one from the panel", async () => {
+      const go = vi.fn();
+      const fetch = stubFetch({
+        "GET /conversations": () => ({ status: 200, body: [conv(2, "Latest")] }),
+        "GET /conversations/2/messages": () => ({ status: 200, body: [msg(1, "user", "hi", 2), msg(2, "assistant", "See [the note](/notes/5).", 2)] }),
+      }).fetch;
+      const el = await open(<ChatWidget client={client(fetch)} launcher="none" defaultSize="side" onNavigate={go} />);
+      await act(async () => { (panel(el).querySelector("a[href='/notes/5']") as HTMLAnchorElement).click(); });
+      expect(go).toHaveBeenCalledWith("/notes/5");
+      expect(panel(el)).not.toBeNull();
+      await click(el, "chat-widget-float");
+      await act(async () => { (panel(el).querySelector("a[href='/notes/5']") as HTMLAnchorElement).click(); });
+      expect(panel(el)).toBeNull();
+    });
+  });
 });
 
 describe("useChat", () => {
