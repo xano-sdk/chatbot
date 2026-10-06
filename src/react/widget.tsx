@@ -39,7 +39,7 @@ export function ChatWidget({ client, onUnauthorized, position = "right", ...text
       )}
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close the assistant" : `Open ${text.assistantName ?? "the assistant"}`}
         data-testid="chat-widget-launcher"
-        className={cx("fixed bottom-4 z-50 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:bottom-6", side, open && "max-sm:hidden")}>
+        className={cx("fixed bottom-[calc(1rem+var(--chat-offset,0px))] z-50 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:bottom-[calc(1.5rem+var(--chat-offset,0px))]", side, open && "max-sm:hidden")}>
         {open ? <IconX width={20} height={20} /> : <IconChat width={22} height={22} />}
       </button>
     </>

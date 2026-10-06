@@ -126,6 +126,10 @@ const chatClient = createChatClient({
 <ChatWidget client={chatClient} assistantName="Acme help" />
 ```
 
+The launcher sits 1 rem (1.5 rem from `sm`) above the bottom edge, plus `--chat-offset`. Set that CSS
+variable when something else owns the bottom of the screen, such as a phone tab bar:
+`:root { --chat-offset: 3.5rem; }`.
+
 What it already gets right, from the rest of this README:
 
 - **Rendering:** assistant replies are Markdown, through a built-in renderer that builds React elements
