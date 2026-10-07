@@ -18,9 +18,10 @@ npm run build       # tsup → dist/ (esm + d.ts)
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint .
 npm test            # tsc --noEmit && vitest run (type-level tests need the typecheck)
+npm run test:live   # deploy the AI-actions fixture to a local Xano engine and run its Xano tests
 ```
 
-Run `npm run typecheck && npm run lint && npm test` before committing.
+Run `npm run typecheck && npm run lint && npm test` (and `npm run test:live` when `src/ai/` changed) before committing.
 
 ### Never widen a stack
 
@@ -62,6 +63,43 @@ the positive is invisible here. A conditional spread inside a statement *field*
   bundle contract.
 - `test/published-docs.test.ts` — the tarball contract.
 - `scripts/regen-golden.ts` — regenerates the fixture (`npm run fixture:regen`).
+
+## AI actions (`src/ai/`, `defineAiActions`)
+
+- `src/ai/options.ts` holds every check (`resolveAiOptions`). `src/ai/validate.ts` is the per-type
+  validator and its generated unit tests. `src/ai/define.ts` holds the functions, endpoints and agent.
+  `src/ai/tests.ts` holds the generated workflow tests, and `src/ai/types.ts` the wire types plus `AI_CONTRACT`.
+- `test/ai-fixture.ts` is the one fixture (note + an approval-gated ticket, with @xano-sdk/agents approvals as a
+  dev dependency). It builds the golden (`test/fixtures/golden-ai-bundle.json`), the encode tests and `test:live`.
+- Rules, each with a test that fails when the rule is removed (checked by mutation, 2026-10-07):
+  - actions never write;
+  - the validator copies only allowlisted names;
+  - apply validates, refuses everything if anything is dropped, and patches exactly `checked.values`;
+  - owner → 404;
+  - `can.read` / `can.write` → 403;
+  - the rate limit;
+  - every run logged;
+  - the approval gate.
+- **Logic stays in functions taking `actor_id`**; the endpoints only add sign-in.
+- **Bump `AI_CONTRACT` only when an `ai/*` route, input or response the React parts use changes.**
+
+### Facts verified on the local engine (v0.1.21, SDK 1.0.7, 2026-10-07)
+
+- **A `toomanyrequests` (429) precondition does NOT raise inside a workflow test.** It is swallowed and the
+  stack carries on (`to_throw` reports "response is ok"). Over HTTP it is a real 429. So the limit's
+  decision lives in `ai/limit`, which is live-tested, and `test/ai-encode.test.ts` pins the guard in `ai/run`.
+- `xano-free` fails on the local engine with `ERROR_FATAL` "The free model is not available in this process."
+  `s.try_catch` catches it and `caught("message")` carries that text, so it maps to "AI isn't connected".
+- `fl.json_decode` throws on invalid JSON (catchable). `fl.array_keys` lists an object's keys, and
+  `fl.unpick(name)` drops one key. `fl.regex_match` returns `[whole, group1, …]`, or `[]` when there's no match.
+- `"2026-02-30" | to_epochms | epochms_date("Y-m-d")` rolls over to `2026-03-02`. Garbage throws. The
+  date check is that round trip.
+- `s.db.patch({ data: ref("obj") })` writes a dynamic object's keys.
+- A ref drilling into an empty list (`ref("x.dropped.0.field")`) is a fatal "Unable to locate var", even in
+  a branch that never reads it. Build such messages only inside the branch, with `{ safe: true }`.
+- `resp("dropped.0.field")` in a unit test is encoded as `response.dropped["0"]`, which never matches a list.
+  That's why the validator also returns `problems: { field: reason }`.
+- A `c.obj({ k: null })` test input doesn't present `k` to `fl.has`. Clearing uses `""`.
 
 ## Facts verified against a live instance
 
@@ -321,6 +359,7 @@ currently `1.0.0` and the ceiling is the next major. `devDependencies` carries t
 version actually tested, pinned **exactly** (no caret) because it is the single
 version the golden fixture was generated against.
 
+The dev pin moved 1.0.0 → 1.0.7 on 2026-10-07 (AI actions); the chatbot golden fixture was byte-identical.
 Verify the floor by installing it and running the suite, rather than copying the
 number forward:
 
@@ -341,8 +380,7 @@ satisfy a test.
 
 ## Versions
 
-Versions start at 1.0.0 under `@xano-sdk/chatbot` and only 1.0.x increments for
-now, regardless of the change. Do not bump unless told to.
+Versions start at 1.0.0 under `@xano-sdk/chatbot`. Bump only when told to (1.2.0 added AI actions, on request).
 
 ## The golden-bundle contract
 

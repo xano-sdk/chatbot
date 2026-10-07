@@ -145,3 +145,26 @@ export type {
   ChatbotEndpoints,
   ChatbotEndpointName,
 } from "./api/client-types.js";
+
+/**
+ * Inline AI actions on records — summarise, draft a field, fill fields from pasted text — with the
+ * assistant's safety rules: actions never write, model output is validated on the server, applies take
+ * only allowlisted fields under the person's permission (or go through approvals), per-person rate limit
+ * and a usage log. See README "AI actions".
+ */
+export { defineAiActions, registerAiActions, NOT_CONNECTED, MODEL_FAILED, STUB_PREFIX } from "./ai/define.js";
+export type { AiActions } from "./ai/define.js";
+export {
+  resolveAiOptions,
+  AI_ACTIONS_SYSTEM_PROMPT,
+  DEFAULT_AI_RATE_LIMIT,
+  DEFAULT_CONTEXT_LIMIT,
+  DEFAULT_PASTE_LIMIT,
+  INSTRUCTION_LIMIT,
+} from "./ai/options.js";
+export type { AiActionsOptions, AiRecordType, AiFieldSpec, AiFieldType, AiAccess, AiRateLimit, ResolvedAiOptions } from "./ai/options.js";
+export { REASONS as AI_REASONS } from "./ai/validate.js";
+export { AI_CONTRACT } from "./ai/types.js";
+export type {
+  AiInfo, AiRecordInfo, AiFieldInfo, AiFieldKind, AiActionName, AiRunResult, AiApplyResult, AiDropped, AiUsageEntry,
+} from "./ai/types.js";

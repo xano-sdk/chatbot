@@ -490,3 +490,26 @@ Full detail: [README.md](README.md).
 
 - `createChatClient({ apiBaseUrl: <backend>/api:<chat canonical>, getToken })` (or `{ guest: true }`); `<Chat client assistantName welcome suggestions onUnauthorized />` for a page, `<ChatWidget client assistantName />` for a corner launcher; `useChat(client)` + `<Thread chat />` to build your own; `<Markdown text />` alone.
 - Already does the checklist: Markdown for the assistant (safe, elements only), plain text for the person, serialized sends, 401/404/429/500 handling, tool chips. Tailwind v4: `@source "../node_modules/@xano-sdk/chatbot/dist";`.
+
+## AI actions on a record (`defineAiActions`)
+
+Summarise a record, draft one of its fields, or fill fields from pasted text, with the assistant's safety rules.
+See README "AI actions on a record".
+
+- `const ai = defineAiActions({ user, records: { note: { table, owner?, context: [cols] | fn, fields: { col: { type: "text"|"enum"|"int"|"decimal"|"bool"|"date", max?, min?, values?, required?, label?, hint? } }, draft?: [textCols], extract?: [cols], can?: { read?, write?, others? }, approval?, link?: "/notes/{id}", test?: { row, role? } } }, llm?, stub?, rateLimit?, approvals?: { action }, canonical?, onApply? })`, then `ai.register(app)` once.
+- Only the columns in `fields` are ever written. `id`, `created_at` and the `owner` column can't be listed.
+- `can.*` are role conditions: `(role) => rbac.has(role, "notes.write")`. Never compare roles by hand.
+- Actions (`POST ai/summarise|draft|extract`) never write. `POST ai/apply { record_type, record_id, values }`
+  re-validates and writes as the person, or returns `{ status: "pending", approval_id }` for a gated type.
+- Approvals: `defineApprovals({ actions: { apply_ai: { fn: ai.applyFn, label: "Apply AI changes" } } })` and
+  `approvals: { action: "apply_ai" }`. `ai` is defined first; it calls `approvals/request` by name.
+- Keyed provider: `llm: { type: "openai", apiKey: "{{ $env.OPENAI_KEY }}" }`, and declare `OPENAI_KEY` in
+  `workspaceConfig({ env })`. With no key: `GET ai/info` → `connected: false`, actions → 400 "AI isn't connected yet".
+- Local engine (no model): `stub: true` gives deterministic "Test mode: " answers, and extract reads
+  `field: value` lines. Never set it in production.
+- Tests: `ai/<type>/validate` carries generated unit tests. Each type with `test: { row, role }` gets generated
+  workflow tests (allowlist, invalid value, someone else's record, and with `stub` actions-never-write,
+  extract validation, usage log and rate limit). Run with `deploy --test`.
+- Frontend: `createAiClient({ apiBaseUrl: <backend>/api:<ai canonical>, getToken })`,
+  `<AiActionMenu client record={{ type, id, title }} onApplied />`, `<AiSummary client record />`,
+  `<DraftDialog … field open onOpenChange />` and `<ExtractDialog … open onOpenChange />` from `@xano-sdk/chatbot/react`.

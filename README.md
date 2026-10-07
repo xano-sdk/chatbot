@@ -729,6 +729,123 @@ If you want structured data out of a conversation, give the agent a **tool** tha
 records it and keep the reply itself free text. That also keeps the thing the
 user reads and the thing your system stores from competing for one field.
 
+## AI actions on a record
+
+The assistant answers in a panel. **AI actions** put AI inside the work itself: on one record, a person can
+**summarise** it, **draft** a field (a reply, a body) from an instruction, or **fill fields from pasted text**
+(an email, a chat, meeting notes). They follow the assistant's safety rules:
+
+- **Actions never write.** `summarise`, `draft` and `extract` only read and suggest. Writing is a separate
+  call, `POST ai/apply`.
+- **The server checks what the model proposes.** Each writable field has rules (type, enum values, length,
+  range, a real date). A value that breaks them, or names a field that isn't on the allowlist, is dropped and
+  reported with a plain reason ("Must be one of: low, normal, urgent").
+- **Applies write only allowlisted fields, as the person.** The values are checked again, the person must be
+  allowed to change the record, and a single bad value refuses the whole write. Undo is just another apply.
+- **Approvals, if you want them.** With `@xano-sdk/agents` approvals, an apply becomes a request that someone
+  approves. Nothing is written until then, and the write runs as the approver.
+- **Per-person rate limit and a usage log** (`ai_usage`). The limit counts the log itself, so it needs no redis.
+- **The same provider settings as the chatbot** (`llm`). There's also a deterministic test provider
+  (`stub: true`) for the local engine, which has no model. Without a key, people see "AI isn't connected".
+
+```ts
+// xano/ai.ts
+import { defineAiActions } from "@xano-sdk/chatbot";
+
+export const ai = defineAiActions({
+  user: userTable,                       // your auth table (needs a `role` column for `can`)
+  canonical: "ai",                       // → /api:ai/ai/...
+  llm: { type: "xano-free" },            // or { type: "openai", apiKey: "{{ $env.OPENAI_KEY }}", model: "gpt-4o-mini" }
+  stub: process.env.XANO_AI_STUB === "1", // local engine / tests only
+  records: {
+    ticket: {
+      table: ticket,
+      owner: "requester_id",             // people only reach their own (see can.others)
+      context: ["subject", "message"],   // or a function taking { record_id, actor_id } that returns text
+      fields: {
+        subject: { type: "text", max: 120, required: true },
+        reply:   { type: "text", max: 4000 },
+        urgency: { type: "enum", values: ["low", "normal", "urgent"] },
+        due_on:  { type: "date", label: "Due date" },
+      },
+      draft: ["reply"],
+      extract: ["subject", "urgency", "due_on"],
+      can: { write: (role) => rbac.has(role, "tickets.write"), others: (role) => rbac.has(role, "tickets.read_all") },
+      link: "/tickets/{id}",
+    },
+  },
+  onApply: ({ type, id, actor }) => [changed({ entity: type, id, actor, via: "AI" })], // your realtime publish
+});
+ai.register(app);
+```
+
+### Endpoints (`auth`: your user table; request history off)
+
+| | |
+|---|---|
+| `GET ai/info` | `{ contract, connected, provider: "stub" \| "model", limit: { max, ttl, used }, paste_limit, instruction_limit, records: { <type>: { label, fields, summarise, draft, extract, approval, read, write } } }` |
+| `POST ai/summarise` `{ record_type, record_id }` | `AiRunResult` with `text` |
+| `POST ai/draft` `{ record_type, record_id, field, instruction }` | `text` (cut to the field's `max`), and `current` |
+| `POST ai/extract` `{ record_type, record_id, text }` | `values` (validated), `dropped` (`{ field, value, reason }[]`), and `current` |
+| `POST ai/apply` `{ record_type, record_id, values }` | `{ status: "applied", applied, record }` or `{ status: "pending", approval_id }`. An empty string clears a field (for an undo); a required field can't be cleared. |
+| `GET ai/usage` | the person's last 50 runs |
+
+Errors: `400` for a bad input or a refused value (the message names the field and the reason), and for
+**"AI isn't connected yet…"**. `403` when the role can't, `404` for a record that's missing *or not theirs*
+(the same answer, so ids can't be probed), `429` over the limit, `500` when the model fails.
+
+The logic is in functions that take the person's id: `ai/run`, `ai/limit`, `ai/apply` (the approvals action),
+`ai/request_apply`, and per type `ai/<type>/load`, `ai/<type>/validate` (which carries generated unit tests)
+and `ai/<type>/apply`.
+
+### Approvals
+
+```ts
+export const approvals = defineApprovals({ user, actions: {
+  apply_ai: { fn: ai.applyFn, label: "Apply AI changes" },   // add approvers: rbac.rolesWith("…") to route it
+} });
+// and in defineAiActions: approvals: { action: "apply_ai" }   (per type: approval: false opts out)
+```
+
+`ai/request_apply` checks the values first, so an approver only ever sees a change that would pass. It
+then calls `approvals/request` by name, with a title ("Apply AI changes to the ticket “Refund”"), a preview
+("Urgency: urgent") and your `link`. This package doesn't depend on `@xano-sdk/agents`.
+
+### Provider, keys and the stub
+
+- **`llm`** takes the chatbot's settings. A keyed provider names its key `{{ $env.NAME }}`. Declare `NAME` in
+  your `workspaceConfig({ env })`. While it's empty, `ai/info` says `connected: false` and actions answer
+  `400` "AI isn't connected yet". On a local engine, `xano-free` fails with "not available in this process",
+  and that's reported the same way.
+- **`stub: true`** answers with a deterministic test provider whenever no key is set. With `xano-free` it
+  always answers. Summaries and drafts start with "Test mode: ", and extract reads `field: value` lines from
+  the pasted text. Those values go through the same validation as a model's, so the whole path can be tested
+  end to end on a local engine. Never set it in production: the UI marks those answers as test mode.
+
+### Frontend
+
+```tsx
+import { createAiClient, AiActionMenu, AiSummary } from "@xano-sdk/chatbot/react";
+const ai = createAiClient({ apiBaseUrl: `${XANO_HOST}/api:ai`, getToken: () => token.get() });
+
+<AiActionMenu client={ai} record={{ type: "ticket", id: t.id, title: t.subject }} onApplied={() => refetch()} />
+<AiSummary client={ai} record={{ type: "ticket", id: t.id }} />
+```
+
+- `<AiActionMenu>` is the sparkle menu: Summarise, Draft <field>…, and Fill fields from text….
+  - It's hidden from people who can't use AI on the type.
+  - Locked items say why; if there's no model it says AI isn't connected.
+  - It shows how many runs are left.
+  - It has full keyboard support, and focus comes back to the button.
+- `<AiSummary>` is inline. It has an empty state with a first action, loading, the summary, regenerate, copy,
+  and errors with retry.
+- `<DraftDialog>` goes from an instruction (with suggestion chips) to progress you can stop, then an editable
+  draft with a character count. Apply it, or send it for approval, then undo.
+- `<ExtractDialog>` goes from pasted text to progress, then a field-by-field Now → Suggested table with a
+  checkbox per change. It also lists what wasn't used and why. Apply, then undo.
+
+Tailwind v4 needs `@source "../node_modules/@xano-sdk/chatbot/dist";` (shadcn theme tokens, light and dark).
+
 ## Errors
 
 Common HTTP status codes returned by the chatbot endpoints (wrapped in Xano's

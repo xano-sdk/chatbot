@@ -8,3 +8,6 @@ docs/
 
 # python bytecode from .github/scripts
 __pycache__/
+.live/
+.live-debug/.xano/
+.live-debug/
