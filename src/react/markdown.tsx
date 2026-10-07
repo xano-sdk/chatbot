@@ -21,7 +21,7 @@ export const NavigateContext = createContext<((href: string) => void) | undefine
 function InAppLink({ href, children }: { href: string; children: ReactNode }) {
   const navigate = useContext(NavigateContext);
   return (
-    <a href={href} data-in-app="" className="font-medium text-primary underline underline-offset-2"
+    <a href={href} data-in-app="" className="font-medium text-foreground underline underline-offset-2"
       onClick={(e) => { if (navigate && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); navigate(href); } }}>
       {children}
     </a>
@@ -38,7 +38,7 @@ export function inline(text: string, key = "i"): ReactNode[] {
   while ((m = re.exec(text))) {
     if (m.index > last) out.push(text.slice(last, m.index));
     const k = `${key}-${n++}`;
-    if (m[2] !== undefined) out.push(<code key={k} className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]">{m[2]}</code>);
+    if (m[2] !== undefined) out.push(<code key={k} className="rounded bg-muted px-1 py-0.5 font-mono text-xs">{m[2]}</code>);
     else if (m[3] !== undefined) {
       const href = m[4]!;
       out.push(SAFE_URL.test(href)

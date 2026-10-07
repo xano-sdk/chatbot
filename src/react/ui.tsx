@@ -17,9 +17,9 @@ export function Button({ variant = "default", icon = false, className, ...props 
       type="button"
       {...props}
       className={cx(
-        "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md text-[0.8125rem] font-medium transition-colors [&_svg]:shrink-0",
+        "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md text-sm font-medium transition-colors [&_svg]:shrink-0",
         icon ? "size-8" : "h-8 px-3",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
         variant === "default" && "bg-primary text-primary-foreground hover:bg-primary/90",
         variant === "outline" && "border bg-background hover:bg-muted",
         variant === "ghost" && "hover:bg-muted",
@@ -34,7 +34,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
     <select
       {...props}
       className={cx(
-        "h-8 rounded-md border bg-background px-2 text-[0.8125rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+        "h-8 rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background disabled:opacity-60",
         className,
       )}
     />
@@ -63,8 +63,8 @@ export function ConfirmDialog({ open, title, children, confirmLabel, busy, onCon
     >
       {open && (
         <div className="space-y-4">
-          <h2 id="chat-confirm-title" className="text-base font-semibold">{title}</h2>
-          <div className="space-y-1 text-[0.8125rem] text-muted-foreground">{children}</div>
+          <h2 id="chat-confirm-title" className="text-lg font-semibold tracking-tight">{title}</h2>
+          <div className="space-y-1 text-sm text-muted-foreground">{children}</div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onCancel} disabled={busy}>Cancel</Button>
             <Button onClick={onConfirm} disabled={busy} data-testid="confirm-action">{busy ? "Saving…" : confirmLabel}</Button>
@@ -75,14 +75,15 @@ export function ConfirmDialog({ open, title, children, confirmLabel, busy, onCon
   );
 }
 
+/** A status pill (h-5, rounded-full, caption size): neutral, quiet outline, the accent fill, or danger. */
 export function Badge({ tone = "muted", children }: { tone?: "muted" | "strong" | "outline" | "danger"; children: ReactNode }) {
   return (
     <span className={cx(
-      "inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[0.6875rem] font-medium",
-      tone === "muted" && "bg-muted text-muted-foreground",
+      "inline-flex h-5 shrink-0 items-center rounded-full px-2 text-xs font-medium whitespace-nowrap",
+      tone === "muted" && "bg-secondary text-secondary-foreground",
       tone === "strong" && "bg-primary text-primary-foreground",
       tone === "outline" && "border text-muted-foreground",
-      tone === "danger" && "bg-destructive text-white",
+      tone === "danger" && "bg-destructive/12 text-destructive",
     )}>{children}</span>
   );
 }
@@ -105,8 +106,8 @@ export function Modal({ open, title, description, children, onClose, testId }: {
         <div className="min-w-0 space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold">{title}</h2>
-              {description && <p className="text-[0.8125rem] text-muted-foreground">{description}</p>}
+              <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+              {description && <p className="text-sm text-muted-foreground">{description}</p>}
             </div>
             <Button variant="ghost" aria-label="Close" onClick={onClose}>✕</Button>
           </div>

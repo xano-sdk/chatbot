@@ -161,7 +161,7 @@ export function ChatWidget({ client, onUnauthorized, position = "right", launche
           <header className="flex h-12 shrink-0 items-center gap-1 border-b px-2">
             <Button variant="ghost" icon aria-label={history ? "Back to the chat" : "Your chats"} aria-pressed={history} onClick={() => setHistory((h) => !h)}
               className={cx(size === "full" && "md:hidden")} data-testid="chat-widget-history"><IconHistory /></Button>
-            <h2 className="min-w-0 flex-1 truncate px-1 text-sm font-medium">{name}</h2>
+            <h2 className="min-w-0 flex-1 truncate px-1 text-sm font-semibold">{name}</h2>
             <Button variant="ghost" icon aria-label="New chat" className={cx(size === "full" && "md:hidden")} onClick={fresh}><IconPlus /></Button>
             {size === "full" ? (
               <Button variant="ghost" icon aria-label="Exit full screen" title="Exit full screen (Esc)" className="max-sm:hidden" onClick={() => setSize(before)} data-testid="chat-widget-exit-full"><IconCollapse /></Button>
@@ -186,7 +186,7 @@ export function ChatWidget({ client, onUnauthorized, position = "right", launche
       )}
       {launcher === "floating" && <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close the assistant" : `Open ${text.assistantName ?? "the assistant"}`}
         data-testid="chat-widget-launcher"
-        className={cx("fixed bottom-[calc(1rem+var(--chat-offset,0px))] z-50 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:bottom-[calc(1.5rem+var(--chat-offset,0px))]", side, open && (size === "panel" ? "max-sm:hidden" : "hidden"))}>
+        className={cx("fixed bottom-[calc(1rem+var(--chat-offset,0px))] z-50 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background sm:bottom-[calc(1.5rem+var(--chat-offset,0px))]", side, open && (size === "panel" ? "max-sm:hidden" : "hidden"))}>
         {open ? <IconX width={20} height={20} /> : <IconChat width={22} height={22} />}
       </button>}
     </>
