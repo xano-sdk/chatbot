@@ -17,7 +17,7 @@ export function Sidebar({ chat, onPick, onNew }: { chat: ReturnType<typeof useCh
       <Button onClick={onNew} variant="outline" className="w-full justify-start" data-testid="chat-new"><IconPlus />New chat</Button>
       {(chat.conversations?.length ?? 0) > 5 && (
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search chats" aria-label="Search chats"
-          className="h-8 rounded-md border bg-background px-2.5 text-[0.8125rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+          className="h-8 rounded-md border bg-background px-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background" />
       )}
       <ul className="-mx-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto px-1">
         {chat.conversations === null ? [0, 1, 2].map((i) => <li key={i} className="h-9 animate-pulse rounded-md bg-muted" />)
@@ -25,13 +25,13 @@ export function Sidebar({ chat, onPick, onNew }: { chat: ReturnType<typeof useCh
           : shown.map((c) => (
             <li key={c.id} className="group relative">
               <button type="button" onClick={() => onPick(c.id)} aria-current={c.id === chat.activeId ? "true" : undefined} data-testid="chat-conversation"
-                className={cx("flex w-full flex-col rounded-md px-2 py-1.5 pr-8 text-left text-[0.8125rem] transition-colors",
-                  c.id === chat.activeId ? "bg-muted font-medium" : "hover:bg-muted/60")}>
+                className={cx("flex w-full flex-col rounded-md px-2 py-1.5 pr-8 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
+                  c.id === chat.activeId ? "bg-accent font-medium text-accent-foreground" : "hover:bg-muted/50")}>
                 <span className="truncate">{label(c)}</span>
-                <Ago ms={c.last_message_at ?? c.created_at} className="text-[0.6875rem] font-normal text-muted-foreground" />
+                <Ago ms={c.last_message_at ?? c.created_at} className="text-xs font-normal text-muted-foreground" />
               </button>
               <button type="button" aria-label={`Delete ${label(c)}`} onClick={() => setDeleting(c)} data-testid="chat-delete"
-                className="absolute top-1/2 right-1 -translate-y-1/2 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100">
+                className="absolute top-1/2 right-1 -translate-y-1/2 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background">
                 <IconTrash width={14} height={14} />
               </button>
             </li>
@@ -72,7 +72,7 @@ export function Chat({ client, className, onUnauthorized, ...text }: ThreadText 
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
           <Button variant="ghost" icon className="md:hidden" aria-label="Show chats" onClick={() => setDrawer(true)}><IconMenu /></Button>
-          <h1 className="min-w-0 flex-1 truncate text-sm font-medium" data-testid="chat-title">{active ? label(active) : text.assistantName ?? "Assistant"}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-sm font-semibold" data-testid="chat-title">{active ? label(active) : text.assistantName ?? "Assistant"}</h1>
           <Button variant="ghost" icon className="md:hidden" aria-label="New chat" onClick={fresh}><IconPlus /></Button>
         </header>
         <Thread chat={chat} text={text} autoFocus />
