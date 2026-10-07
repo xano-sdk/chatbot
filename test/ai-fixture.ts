@@ -87,7 +87,8 @@ export function buildAiFixture() {
         approval: false,
         can: { write: editorOrAdmin, others: (role) => expr(role, "=", c.text("admin")) },
         link: "/notes/{id}",
-        test: { row: { title: "Launch checklist", body: "Steps for launch day.", priority: 2, stage: "writing", status: "draft" }, role: "editor" },
+        // admin passes can.others, so the generated stranger test takes its "may load" branch here; ticket (editor) keeps the refusal.
+        test: { row: { title: "Launch checklist", body: "Steps for launch day.", priority: 2, stage: "writing", status: "draft" }, role: "admin" },
       },
       ticket: {
         table: ticket,

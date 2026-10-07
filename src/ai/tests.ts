@@ -8,12 +8,13 @@
  * They run in an EMPTY database, so each makes its own people and records. A `to_throw` body can't see
  * variables bound outside it, so it re-reads the person by email (or name) and the record as the newest row.
  */
-import { c, expr, col, fl, ref, s, withFilters, workflowTest, type AnyTableDef, type ObjectRef, type Statement, type Value } from "@xano/sdk";
+import { and, c, expr, col, fl, ref, s, withFilters, workflowTest, type AnyTableDef, type Condition, type ObjectRef, type Statement, type Value } from "@xano/sdk";
 import type { ResolvedAiOptions, ResolvedRecordType } from "./options.js";
 import { invalidFor, sampleFor, toConst, REASONS } from "./validate.js";
 
 type PerType = { rt: ResolvedRecordType; load: ObjectRef; validate: ObjectRef; apply: ObjectRef };
 type Column = { type?: string };
+const node = (cnd: Condition) => (Array.isArray(cnd) ? and(...cnd) : cnd);
 
 export function aiWorkflowTests(
   o: ResolvedAiOptions,
@@ -97,22 +98,41 @@ export function aiWorkflowTests(
       const strangerRuns: Statement[] = o.stub && rt.summarise
         ? [s.expect.to_throw({ exception: c.text("isn't available"), body: [find$("stranger"), latest$(rt), run$("x", ref("stranger.id"), rt, ref("rows.0.id"), "summarise")] })]
         : [];
+      const refused: Statement[] = [
+        s.expect.to_throw({ exception: c.text("isn't available"), body: [
+          find$("stranger"), latest$(rt),
+          s.function.call({ fn: p.load, as: "x", input: { actor_id: ref("stranger.id"), record_id: ref("rows.0.id"), write: c.bool(false) } }),
+        ] }),
+        s.expect.to_throw({ exception: c.text("isn't available"), body: [
+          find$("stranger"), latest$(rt),
+          apply$("x", ref("stranger.id"), rt, ref("rows.0.id"), c.obj({ [first]: sample.input } as never)),
+        ] }),
+        ...strangerRuns,
+      ];
+      // `can.others` may let the test role past the owner rule (e.g. editors who read everyone's notes). The
+      // condition is evaluated on the stranger's own role, as `load` does on `me.role`; when it passes, the
+      // stranger can load the record instead, and nothing is applied.
+      const others = rt.can.others;
+      const checks: Statement[] = others
+        ? [s.conditional({
+            when: node(others(ref("stranger.role"))),
+            then: [
+              s.function.call({ fn: p.load, as: "seen", input: { actor_id: ref("stranger.id"), record_id: ref("rec.id"), write: c.bool(false) } }),
+              same(ref("seen.record.id"), ref("rec.id")),
+            ],
+            else: refused,
+          })]
+        : refused;
       tests.push(workflowTest({
         name: `ai: ${rt.key} — someone else's ${rt.label} isn't available`,
-        description: "A person who doesn't own the record can't load, run AI on, or apply to it; it answers as if missing.",
+        description: others
+          ? "A person who doesn't own the record can't load, run AI on, or apply to it, unless can.others lets their role in; refused, it answers as if missing."
+          : "A person who doesn't own the record can't load, run AI on, or apply to it; it answers as if missing.",
         stack: [
           person$("owner", role),
           person$("stranger", role),
           row$(rt, "owner"),
-          s.expect.to_throw({ exception: c.text("isn't available"), body: [
-            find$("stranger"), latest$(rt),
-            s.function.call({ fn: p.load, as: "x", input: { actor_id: ref("stranger.id"), record_id: ref("rows.0.id"), write: c.bool(false) } }),
-          ] }),
-          s.expect.to_throw({ exception: c.text("isn't available"), body: [
-            find$("stranger"), latest$(rt),
-            apply$("x", ref("stranger.id"), rt, ref("rows.0.id"), c.obj({ [first]: sample.input } as never)),
-          ] }),
-          ...strangerRuns,
+          ...checks,
           s.db.get({ table: rt.table, fieldValue: ref("rec.id"), as: "after" }),
           ...unchanged("after"),
         ],

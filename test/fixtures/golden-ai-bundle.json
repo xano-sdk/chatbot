@@ -32452,7 +32452,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -33311,7 +33311,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -33803,7 +33803,7 @@
       },
       {
         "name": "ai: note — someone else's note isn't available",
-        "description": "A person who doesn't own the record can't load, run AI on, or apply to it; it answers as if missing.",
+        "description": "A person who doesn't own the record can't load, run AI on, or apply to it, unless can.others lets their role in; refused, it answers as if missing.",
         "docs": "",
         "datasource": "",
         "active": true,
@@ -33862,7 +33862,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -33939,7 +33939,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -34069,7 +34069,7 @@
           },
           {
             "as": "",
-            "name": "mvp:test_expect_to_throw",
+            "name": "mvp:conditional",
             "_xsid": "",
             "addon": [],
             "input": [],
@@ -34080,519 +34080,648 @@
               "customize": false
             },
             "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
                     },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "eb934878c76367e89261b773ec5ca617"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "stranger.role",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "admin",
+                        "tag": "const",
+                        "filters": []
                       }
                     }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "write",
-                      "value": "false",
-                      "tag": "const:bool",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "id": "1c32710b8c75502c24965ba874d44cad"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
-              }
-            },
-            "runtime": null,
-            "disabled": false,
-            "description": "",
-            "settings_registry": null
-          },
-          {
-            "as": "",
-            "name": "mvp:test_expect_to_throw",
-            "_xsid": "",
-            "addon": [],
-            "input": [],
-            "mocks": {},
-            "output": {
-              "items": [],
-              "filters": [],
-              "customize": false
-            },
-            "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "eb934878c76367e89261b773ec5ca617"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                  }
+                ]
+              },
+              "if": {
+                "run": [
+                  {
+                    "as": "seen",
+                    "name": "mvp:workspace_run_function",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [
+                      {
+                        "name": "actor_id",
+                        "value": "stranger.id",
+                        "tag": "var",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "record_id",
+                        "value": "rec.id",
+                        "tag": "var",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "write",
+                        "value": "false",
+                        "tag": "const:bool",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
                       }
-                    }
+                    ],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "id": "1c32710b8c75502c24965ba874d44cad"
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_equal",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_type",
-                      "value": "note",
-                      "tag": "const",
+                    "context": {
+                      "value1": {
+                        "value": "seen.record.id",
+                        "tag": "var"
+                      },
+                      "value2": {
+                        "value": "rec.id",
+                        "tag": "var"
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
+              },
+              "elif": {
+                "run": []
+              },
+              "else": {
+                "run": [
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "values",
-                      "value": "{}",
-                      "tag": "const:obj",
-                      "filters": [
+                    "context": {
+                      "run": [
                         {
-                          "name": "set",
-                          "disabled": false,
-                          "arg": [
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
                             {
-                              "value": "title",
+                              "name": "field_name",
+                              "value": "email",
                               "tag": "const",
-                              "filters": []
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
                             },
                             {
-                              "value": "  Sample text  ",
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
                               "tag": "const",
-                              "filters": []
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
                             }
-                          ]
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "eb934878c76367e89261b773ec5ca617"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "write",
+                              "value": "false",
+                              "tag": "const:bool",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "1c32710b8c75502c24965ba874d44cad"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
                         }
                       ],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "id": "a8682358611ad1aab885f99ce49061f4"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
-              }
-            },
-            "runtime": null,
-            "disabled": false,
-            "description": "",
-            "settings_registry": null
-          },
-          {
-            "as": "",
-            "name": "mvp:test_expect_to_throw",
-            "_xsid": "",
-            "addon": [],
-            "input": [],
-            "mocks": {},
-            "output": {
-              "items": [],
-              "filters": [],
-              "customize": false
-            },
-            "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "eb934878c76367e89261b773ec5ca617"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
                       }
-                    }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_type",
-                      "value": "note",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                    "context": {
+                      "run": [
+                        {
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "field_name",
+                              "value": "email",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "eb934878c76367e89261b773ec5ca617"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_type",
+                              "value": "note",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "values",
+                              "value": "{}",
+                              "tag": "const:obj",
+                              "filters": [
+                                {
+                                  "name": "set",
+                                  "disabled": false,
+                                  "arg": [
+                                    {
+                                      "value": "title",
+                                      "tag": "const",
+                                      "filters": []
+                                    },
+                                    {
+                                      "value": "  Sample text  ",
+                                      "tag": "const",
+                                      "filters": []
+                                    }
+                                  ]
+                                }
+                              ],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "a8682358611ad1aab885f99ce49061f4"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        }
+                      ],
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
+                      }
                     },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "action",
-                      "value": "summarise",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "instruction",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "text",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "context": {
-                    "id": "95465cde270b9a0449187fab3bf6b659"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "run": [
+                        {
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "field_name",
+                              "value": "email",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "eb934878c76367e89261b773ec5ca617"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_type",
+                              "value": "note",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "action",
+                              "value": "summarise",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "instruction",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "text",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "95465cde270b9a0449187fab3bf6b659"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        }
+                      ],
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
               }
             },
             "runtime": null,
@@ -34840,7 +34969,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -35649,7 +35778,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -37270,7 +37399,7 @@
       },
       {
         "name": "ai: ticket — someone else's ticket isn't available",
-        "description": "A person who doesn't own the record can't load, run AI on, or apply to it; it answers as if missing.",
+        "description": "A person who doesn't own the record can't load, run AI on, or apply to it, unless can.others lets their role in; refused, it answers as if missing.",
         "docs": "",
         "datasource": "",
         "active": true,
@@ -37518,7 +37647,7 @@
           },
           {
             "as": "",
-            "name": "mvp:test_expect_to_throw",
+            "name": "mvp:conditional",
             "_xsid": "",
             "addon": [],
             "input": [],
@@ -37529,519 +37658,648 @@
               "customize": false
             },
             "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+              "expr": {
+                "expression": [
+                  {
+                    "type": "statement",
+                    "or": false,
+                    "group": {
+                      "expression": []
                     },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "47ed367c5d68049378e5a8a0433f85db"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                    "statement": {
+                      "op": "=",
+                      "left": {
+                        "operand": "stranger.role",
+                        "tag": "var",
+                        "filters": []
+                      },
+                      "right": {
+                        "operand": "admin",
+                        "tag": "const",
+                        "filters": []
                       }
                     }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "write",
-                      "value": "false",
-                      "tag": "const:bool",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "id": "7b309907a250cbf97d6a654e9af3e62f"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
-              }
-            },
-            "runtime": null,
-            "disabled": false,
-            "description": "",
-            "settings_registry": null
-          },
-          {
-            "as": "",
-            "name": "mvp:test_expect_to_throw",
-            "_xsid": "",
-            "addon": [],
-            "input": [],
-            "mocks": {},
-            "output": {
-              "items": [],
-              "filters": [],
-              "customize": false
-            },
-            "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "47ed367c5d68049378e5a8a0433f85db"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                  }
+                ]
+              },
+              "if": {
+                "run": [
+                  {
+                    "as": "seen",
+                    "name": "mvp:workspace_run_function",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [
+                      {
+                        "name": "actor_id",
+                        "value": "stranger.id",
+                        "tag": "var",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "record_id",
+                        "value": "rec.id",
+                        "tag": "var",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
+                      },
+                      {
+                        "name": "write",
+                        "value": "false",
+                        "tag": "const:bool",
+                        "filters": [],
+                        "ignore": false,
+                        "expand": false,
+                        "children": []
                       }
-                    }
+                    ],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "id": "7b309907a250cbf97d6a654e9af3e62f"
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_equal",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_type",
-                      "value": "ticket",
-                      "tag": "const",
+                    "context": {
+                      "value1": {
+                        "value": "seen.record.id",
+                        "tag": "var"
+                      },
+                      "value2": {
+                        "value": "rec.id",
+                        "tag": "var"
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
+              },
+              "elif": {
+                "run": []
+              },
+              "else": {
+                "run": [
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "values",
-                      "value": "{}",
-                      "tag": "const:obj",
-                      "filters": [
+                    "context": {
+                      "run": [
                         {
-                          "name": "set",
-                          "disabled": false,
-                          "arg": [
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
                             {
-                              "value": "subject",
+                              "name": "field_name",
+                              "value": "email",
                               "tag": "const",
-                              "filters": []
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
                             },
                             {
-                              "value": "  Sample text  ",
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
                               "tag": "const",
-                              "filters": []
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
                             }
-                          ]
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "47ed367c5d68049378e5a8a0433f85db"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "write",
+                              "value": "false",
+                              "tag": "const:bool",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "7b309907a250cbf97d6a654e9af3e62f"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
                         }
                       ],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "id": "a8682358611ad1aab885f99ce49061f4"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
-              }
-            },
-            "runtime": null,
-            "disabled": false,
-            "description": "",
-            "settings_registry": null
-          },
-          {
-            "as": "",
-            "name": "mvp:test_expect_to_throw",
-            "_xsid": "",
-            "addon": [],
-            "input": [],
-            "mocks": {},
-            "output": {
-              "items": [],
-              "filters": [],
-              "customize": false
-            },
-            "context": {
-              "run": [
-                {
-                  "as": "stranger",
-                  "name": "mvp:dbo_getby",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "field_name",
-                      "value": "email",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field_value",
-                      "value": "stranger@ai-test.example",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "490b7155370d23150537ba462116de10"
-                    }
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "rows",
-                  "name": "mvp:dbo_view",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
-                  },
-                  "context": {
-                    "dbo": {
-                      "id": "47ed367c5d68049378e5a8a0433f85db"
-                    },
-                    "return": {
-                      "type": "list",
-                      "list": {
-                        "distinct": "auto",
-                        "sort": [
-                          {
-                            "sortBy": "id",
-                            "orderBy": "desc"
-                          }
-                        ],
-                        "paging": {
-                          "enabled": true,
-                          "page": 1,
-                          "offset": 0,
-                          "per_page": 1,
-                          "metadata": false,
-                          "totals": false
-                        }
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
                       }
-                    }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                },
-                {
-                  "as": "x",
-                  "name": "mvp:workspace_run_function",
-                  "_xsid": "",
-                  "addon": [],
-                  "input": [
-                    {
-                      "name": "actor_id",
-                      "value": "stranger.id",
-                      "tag": "var",
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
                       "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                      "customize": false
                     },
-                    {
-                      "name": "record_type",
-                      "value": "ticket",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
+                    "context": {
+                      "run": [
+                        {
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "field_name",
+                              "value": "email",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "47ed367c5d68049378e5a8a0433f85db"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_type",
+                              "value": "ticket",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "values",
+                              "value": "{}",
+                              "tag": "const:obj",
+                              "filters": [
+                                {
+                                  "name": "set",
+                                  "disabled": false,
+                                  "arg": [
+                                    {
+                                      "value": "subject",
+                                      "tag": "const",
+                                      "filters": []
+                                    },
+                                    {
+                                      "value": "  Sample text  ",
+                                      "tag": "const",
+                                      "filters": []
+                                    }
+                                  ]
+                                }
+                              ],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "a8682358611ad1aab885f99ce49061f4"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        }
+                      ],
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
+                      }
                     },
-                    {
-                      "name": "record_id",
-                      "value": "rows.0.id",
-                      "tag": "var",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "action",
-                      "value": "summarise",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "field",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "instruction",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    },
-                    {
-                      "name": "text",
-                      "value": "",
-                      "tag": "const",
-                      "filters": [],
-                      "ignore": false,
-                      "expand": false,
-                      "children": []
-                    }
-                  ],
-                  "mocks": {},
-                  "output": {
-                    "items": [],
-                    "filters": [],
-                    "customize": false
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
                   },
-                  "context": {
-                    "id": "95465cde270b9a0449187fab3bf6b659"
-                  },
-                  "runtime": null,
-                  "disabled": false,
-                  "description": "",
-                  "settings_registry": null
-                }
-              ],
-              "value1": {
-                "value": "isn't available",
-                "tag": "const",
-                "filters": []
+                  {
+                    "as": "",
+                    "name": "mvp:test_expect_to_throw",
+                    "_xsid": "",
+                    "addon": [],
+                    "input": [],
+                    "mocks": {},
+                    "output": {
+                      "items": [],
+                      "filters": [],
+                      "customize": false
+                    },
+                    "context": {
+                      "run": [
+                        {
+                          "as": "stranger",
+                          "name": "mvp:dbo_getby",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "field_name",
+                              "value": "email",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field_value",
+                              "value": "stranger@ai-test.example",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "490b7155370d23150537ba462116de10"
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "rows",
+                          "name": "mvp:dbo_view",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "dbo": {
+                              "id": "47ed367c5d68049378e5a8a0433f85db"
+                            },
+                            "return": {
+                              "type": "list",
+                              "list": {
+                                "distinct": "auto",
+                                "sort": [
+                                  {
+                                    "sortBy": "id",
+                                    "orderBy": "desc"
+                                  }
+                                ],
+                                "paging": {
+                                  "enabled": true,
+                                  "page": 1,
+                                  "offset": 0,
+                                  "per_page": 1,
+                                  "metadata": false,
+                                  "totals": false
+                                }
+                              }
+                            }
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        },
+                        {
+                          "as": "x",
+                          "name": "mvp:workspace_run_function",
+                          "_xsid": "",
+                          "addon": [],
+                          "input": [
+                            {
+                              "name": "actor_id",
+                              "value": "stranger.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_type",
+                              "value": "ticket",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "record_id",
+                              "value": "rows.0.id",
+                              "tag": "var",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "action",
+                              "value": "summarise",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "field",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "instruction",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            },
+                            {
+                              "name": "text",
+                              "value": "",
+                              "tag": "const",
+                              "filters": [],
+                              "ignore": false,
+                              "expand": false,
+                              "children": []
+                            }
+                          ],
+                          "mocks": {},
+                          "output": {
+                            "items": [],
+                            "filters": [],
+                            "customize": false
+                          },
+                          "context": {
+                            "id": "95465cde270b9a0449187fab3bf6b659"
+                          },
+                          "runtime": null,
+                          "disabled": false,
+                          "description": "",
+                          "settings_registry": null
+                        }
+                      ],
+                      "value1": {
+                        "value": "isn't available",
+                        "tag": "const",
+                        "filters": []
+                      }
+                    },
+                    "runtime": null,
+                    "disabled": false,
+                    "description": "",
+                    "settings_registry": null
+                  }
+                ]
               }
             },
             "runtime": null,
@@ -39314,7 +39572,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -39786,7 +40044,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -39863,7 +40121,7 @@
               },
               {
                 "name": "role",
-                "value": "editor",
+                "value": "admin",
                 "tag": "const",
                 "filters": [],
                 "ignore": false,
@@ -45360,5 +45618,5 @@
     "service": [],
     "branch": []
   },
-  "sig": "RGvUZy7apYCF0iSuGLnRY7gsLhc."
+  "sig": "aEq2QCyRVyz7gAUO75SyIMeNXsE."
 }

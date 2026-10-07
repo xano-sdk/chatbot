@@ -121,6 +121,26 @@ describe("the handle", () => {
       "ai: each person has their own rate limit",
     ]));
   });
+  it("gates the stranger test on can.others for the stranger's role, and leaves it a plain refusal without", () => {
+    const strangerSteps = (others: boolean) => {
+      const o = base();
+      doc$(o).test = { row: { title: "T" }, role: "member" };
+      doc$(o).can = { read: (r) => expr(r, "!=", c.text("nobody")), ...(others ? { others: (r) => expr(r, "=", c.text("member")) } : {}) };
+      const xano = new Xano().registerWorkspace({ name: "ai-stranger" }).registerTables([person, doc]);
+      defineAiActions(o).register(xano);
+      const t = (xano.export() as any).payload.workflow_test.find((x: any) => x.name === "ai: doc — someone else's doc isn't available");
+      return t.run as any[];
+    };
+    const plain = strangerSteps(false);
+    expect(plain.map((st) => st.name).filter((n) => n === "mvp:test_expect_to_throw")).toHaveLength(2);
+    expect(plain.some((st) => st.name === "mvp:conditional")).toBe(false);
+    const gated = strangerSteps(true);
+    const branch = gated.find((st) => st.name === "mvp:conditional");
+    expect(JSON.stringify(branch.context.expr)).toContain('"operand":"stranger.role"');
+    expect(branch.context.if.run.map((st: any) => st.as)).toContain("seen");
+    expect(branch.context.else.run.map((st: any) => st.name)).toEqual(["mvp:test_expect_to_throw", "mvp:test_expect_to_throw"]);
+    expect(gated.some((st) => st.name === "mvp:test_expect_to_throw")).toBe(false);
+  });
   it("runs onApply's statements after the write", () => {
     const ai = defineAiActions({ ...base(), onApply: ({ id }) => [s.set_var("published", id)] });
     const xano = new Xano().registerWorkspace({ name: "ai-hook" }).registerTables([person, doc]);
