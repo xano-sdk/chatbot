@@ -900,7 +900,7 @@ If that trade is wrong for your site, leave `guest` off and require a login.
 
 ## Versioning & Compatibility
 
-- `@xano/sdk`: `>=1.0.0 <2.0.0` peer dependency (built and tested against `1.0.0`).
+- `@xano/sdk`: `>=1.0.16 <2.0.0` peer dependency (built and tested against `1.0.19`).
 - Node.js: `>=20`.
 - Module format: ESM-only.
 

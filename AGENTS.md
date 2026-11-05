@@ -355,11 +355,12 @@ reads to write the registration into `xano/index.ts`. The SDK offers it only whe
 ## The peer range
 
 `@xano/sdk` is a `peerDependency` with the window `>=<floor> <2.0.0` — the floor is
-currently `1.0.0` and the ceiling is the next major. `devDependencies` carries the
+currently `1.0.16`, the first SDK that knows the warning code `diagnostics.allow` names
+(an older SDK refuses it at export), and the ceiling is the next major. `devDependencies` carries the
 version actually tested, pinned **exactly** (no caret) because it is the single
 version the golden fixture was generated against.
 
-The dev pin moved 1.0.0 → 1.0.7 on 2026-10-07 (AI actions); the chatbot golden fixture was byte-identical.
+The dev pin moved 1.0.0 → 1.0.7 on 2026-10-07 (AI actions) and 1.0.7 → 1.0.19 on 2026-11-05; the chatbot golden fixture was byte-identical both times.
 Verify the floor by installing it and running the suite, rather than copying the
 number forward:
 

@@ -7,9 +7,12 @@
  * `ticket` (function context, applies go through @xano-sdk/agents approvals). Its own auth table — this
  * package never imports @xano-sdk/auth.
  */
-import { Xano, c, col, defineFunction, expr, f, fl, inp, input, ref, s, table, withFilters, workflowTest, type Value } from "@xano/sdk";
+import { Xano, c, col, defineFunction, expr, f, fl, inp, input, ref, s, table, withFilters, workflowTest as sdkWorkflowTest, type Value } from "@xano/sdk";
 import { defineApprovals } from "@xano-sdk/agents";
 import { defineAiActions } from "../src/index.js";
+
+// A generated test reads rows it just created, so a missing row already fails that test.
+const workflowTest: typeof sdkWorkflowTest = (def) => sdkWorkflowTest({ ...def, diagnostics: { allow: ["stack.drill-maybe-null"] } });
 
 export const AI_FIXTURE_NAME = "xts-chatbot-ai";
 export const AI_GOLDEN_URL = new URL("./fixtures/golden-ai-bundle.json", import.meta.url);
@@ -53,6 +56,7 @@ export function buildAiFixture() {
   });
   const ticketContext = defineFunction({
     name: "fixture/ticket_context",
+    diagnostics: { allow: ["stack.drill-maybe-null"] },
     input: { record_id: input.int({ required: true }) },
     stack: [
       s.db.get({ table: ticket, fieldValue: inp("record_id"), as: "t" }),
@@ -162,7 +166,7 @@ export function buildAiFixture() {
         s.expect.to_equal({ expr: ref("after.owner_id"), value: ref("editor.id") }),
       ],
     }),
-    workflowTest({
+    sdkWorkflowTest({
       name: "fixture: ticket context comes from the app's function",
       description: "A function context is what the model (here the stub) reads.",
       stack: [

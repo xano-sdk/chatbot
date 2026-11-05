@@ -38,6 +38,8 @@ export function generateReplyFn(
 ) {
   return defineFunction({
     name: opts.names.replyFn,
+    // Every caller has already checked that this conversation exists and belongs to the person.
+    diagnostics: { allow: ["stack.drill-maybe-null"] },
     description:
       "Appends a user message, runs the chat agent over recent history, appends the reply, and returns it. Performs no authorization.",
     tags: opts.tags,

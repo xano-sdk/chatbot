@@ -8,9 +8,12 @@
  * They run in an EMPTY database, so each makes its own people and records. A `to_throw` body can't see
  * variables bound outside it, so it re-reads the person by email (or name) and the record as the newest row.
  */
-import { and, c, expr, col, fl, ref, s, withFilters, workflowTest, type AnyTableDef, type Condition, type ObjectRef, type Statement, type Value } from "@xano/sdk";
+import { and, c, expr, col, fl, ref, s, withFilters, workflowTest as sdkWorkflowTest, type AnyTableDef, type Condition, type ObjectRef, type Statement, type Value } from "@xano/sdk";
 import type { ResolvedAiOptions, ResolvedRecordType } from "./options.js";
 import { invalidFor, sampleFor, toConst, REASONS } from "./validate.js";
+
+// A generated test reads rows it just created, so a missing row already fails that test.
+const workflowTest: typeof sdkWorkflowTest = (def) => sdkWorkflowTest({ ...def, diagnostics: { allow: ["stack.drill-maybe-null"] } });
 
 type PerType = { rt: ResolvedRecordType; load: ObjectRef; validate: ObjectRef; apply: ObjectRef };
 type Column = { type?: string };
@@ -175,7 +178,7 @@ export function aiWorkflowTests(
         "Thanks, talk soon",
       ];
       const droppedCount = scalarBad && scalarBad !== good ? 2 : 1;
-      tests.push(workflowTest({
+      tests.push(sdkWorkflowTest({
         name: `ai: ${rt.key} — extract keeps valid values and reports the rest`,
         description: "The model's proposals are checked on the server: an invalid value and a field outside the allowlist are dropped, with reasons.",
         stack: [
@@ -198,7 +201,7 @@ export function aiWorkflowTests(
     const role = rt.test!.role;
     const action = rt.summarise ? "summarise" : rt.draft.length ? "draft" : "extract";
     const extra = action === "draft" ? { field: rt.draft[0]!, instruction: "Shorter" } : action === "extract" ? { text: "nothing to see" } : {};
-    tests.push(workflowTest({
+    tests.push(sdkWorkflowTest({
       name: "ai: every run is logged for the person",
       description: "A run adds one usage row: who, which action, on what, and that it went fine.",
       stack: [
@@ -214,7 +217,7 @@ export function aiWorkflowTests(
     }));
     if (o.rateLimit) {
       const { max } = o.rateLimit;
-      tests.push(workflowTest({
+      tests.push(sdkWorkflowTest({
         name: "ai: each person has their own rate limit",
         description: `After ${max} runs in the window a person is refused; someone else still can run.`,
         stack: [
